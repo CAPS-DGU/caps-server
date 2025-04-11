@@ -37,8 +37,11 @@ public class SecurityConfig {
             "v3/api-docs/**",
 
             /* api */
-            "/"
-            };
+            "api/v1/wikis/*",
+            "api/v1/wikis/recent",
+            "api/v1/wikis/random",
+            "api/v1/wikis/*/history",
+    };
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

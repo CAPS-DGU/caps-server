@@ -8,11 +8,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Getter
 @Table(name = "wiki")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE wiki SET is_deleted = true WHERE id = ?")
 public class Wiki extends BaseTimeEntity {
 
     @Id
@@ -26,7 +28,8 @@ public class Wiki extends BaseTimeEntity {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "text")
+    @Lob
+    @Column(nullable = false)
     private String content;
 
     @Column(nullable = false)

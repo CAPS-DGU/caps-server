@@ -1,6 +1,5 @@
 package kr.dgucaps.caps.domain.member.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import kr.dgucaps.caps.domain.member.dto.request.UpdateMemberRequest;
 import kr.dgucaps.caps.domain.member.service.MemberService;
@@ -13,24 +12,21 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
-public class MemberController {
+public class MemberController implements MemberApi {
 
     private final MemberService memberService;
 
     @GetMapping("/me")
-    @Operation(summary = "내 정보 조회")
     public ResponseEntity<SuccessResponse<?>> getMemberInfo(@AuthenticationPrincipal Long memberId) {
         return SuccessResponse.ok(memberService.getMemberInfo(memberId));
     }
 
     @GetMapping("/{memberId}")
-    @Operation(summary = "번호로 회원 조회", description = "회원 정보 조회")
     public ResponseEntity<SuccessResponse<?>> getOtherMemberInfo(@PathVariable("memberId") Long memberId) {
         return SuccessResponse.ok(memberService.getMemberInfo(memberId));
     }
 
     @PatchMapping("/me")
-    @Operation(summary = "회원 정보 수정", description = "수정이 필요하지 않은 필드는 null로 요청")
     public ResponseEntity<SuccessResponse<?>> updateMember(@AuthenticationPrincipal Long memberId,
                                                            @Valid @RequestBody UpdateMemberRequest request) {
         return SuccessResponse.ok(memberService.updateMember(memberId, request));

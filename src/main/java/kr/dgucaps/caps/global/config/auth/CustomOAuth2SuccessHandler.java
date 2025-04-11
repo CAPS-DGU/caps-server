@@ -28,6 +28,12 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     @Value("${jwt.refresh-token-expire-time}")
     private int REFRESH_TOKEN_EXPIRE_TIME;
 
+    @Value("${app.auth.redirect.home}")
+    private String homeRedirectUrl;
+
+    @Value("${app.auth.redirect.onboarding}")
+    private String onboardingRedirectUrl;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomOAuth2User customUser = (CustomOAuth2User) authentication.getPrincipal();
@@ -40,9 +46,9 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         // 추가 정보 입력 여부에 따라 리다이렉트
         if (member.isRegistrationComplete()) {
-            response.sendRedirect("http://localhost:8080/");
+            response.sendRedirect(homeRedirectUrl);
         } else {
-            response.sendRedirect("http://localhost:8080/additional/");
+            response.sendRedirect(onboardingRedirectUrl);
         }
     }
 

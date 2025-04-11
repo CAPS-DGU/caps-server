@@ -22,12 +22,13 @@ public interface WikiApi {
 
     @Operation(
             summary = "위키 작성 & 수정",
-            description = "위키를 작성하거나 수정합니다. \n" +
+            description = "위키를 작성하거나 수정합니다.  \n" +
                     "title이 존재하지 않으면 새로 작성하고, 존재하면 수정합니다."
     )
-    @ApiResponse(responseCode = "201", description = "위키 작성 성공",
+    @ApiResponse(responseCode = "200", description = "위키 작성/수정 성공",
             content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = WikiResponse.class)))
+                    schema = @Schema(implementation = WikiResponse.class))
+    )
     ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal Long memberId,
                                                   @Valid @RequestBody CreateOrModifyWikiRequest request);
 
@@ -50,7 +51,8 @@ public interface WikiApi {
     @ApiResponse(responseCode = "200", description = "수정 내역 조회 성공",
             content = @Content(mediaType = "application/json",
                     array = @ArraySchema(
-                            schema = @Schema(implementation = WikiResponse.class))))
+                            schema = @Schema(implementation = WikiResponse.class)))
+    )
     ResponseEntity<SuccessResponse<?>> getWikiHistory(@PathVariable(value = "title") String title);
 
     @Operation(
@@ -72,6 +74,7 @@ public interface WikiApi {
     @ApiResponse(responseCode = "200", description = "무작위 위키 조회 성공",
             content = @Content(mediaType = "application/json",
                     array = @ArraySchema(
-                            schema = @Schema(implementation = WikiTitleResponse.class))))
+                            schema = @Schema(implementation = WikiTitleResponse.class)))
+    )
     ResponseEntity<SuccessResponse<?>> getRecentWiki();
 }

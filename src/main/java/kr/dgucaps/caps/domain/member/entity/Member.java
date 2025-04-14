@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +65,9 @@ public class Member extends BaseTimeEntity {
     @ColumnDefault("false")
     private boolean isDeleted;
 
+    @Column
+    private LocalDateTime lastLoginAt;
+
     @Builder
     public Member(String kakaoId, String name, String email, String phoneNumber, String profileImageUrl) {
         this.role = Role.NEW_MEMBER;
@@ -88,5 +92,9 @@ public class Member extends BaseTimeEntity {
     public void updateMember(String comment, String profileImageUrl) {
         if (comment != null) this.comment = comment;
         if (profileImageUrl != null) this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateLastLogin() {
+        this.lastLoginAt = LocalDateTime.now();
     }
 }

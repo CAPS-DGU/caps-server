@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.dgucaps.caps.domain.member.dto.CustomOAuth2User;
 import kr.dgucaps.caps.domain.member.dto.response.MemberTokenResponse;
 import kr.dgucaps.caps.domain.member.entity.Member;
+import kr.dgucaps.caps.domain.member.service.MemberService;
 import kr.dgucaps.caps.domain.member.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import java.io.IOException;
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final TokenService tokenService;
+    private final MemberService memberService;
 
     @Value("${jwt.access-token-expire-time}")
     private int ACCESS_TOKEN_EXPIRE_TIME;
@@ -43,6 +45,9 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         MemberTokenResponse tokenResponse = tokenService.issueToken(member.getId(), member.getRole());
         response.addCookie(createCookie("accessToken", tokenResponse.accessToken(), ACCESS_TOKEN_EXPIRE_TIME));
         response.addCookie(createCookie("refreshToken", tokenResponse.refreshToken(), REFRESH_TOKEN_EXPIRE_TIME));
+
+        // 마지막 로그인 시간 업데이트
+        memberService.updateLastLogin(member);
 
         // 추가 정보 입력 여부에 따라 리다이렉트
         if (member.isRegistrationComplete()) {

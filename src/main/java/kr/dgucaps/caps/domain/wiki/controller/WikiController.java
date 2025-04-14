@@ -39,7 +39,7 @@ public class WikiController implements WikiApi {
         return SuccessResponse.ok(wikiService.getRandomWiki());
     }
 
-    @GetMapping("/wiki/recent")
+    @GetMapping("/recent")
     public ResponseEntity<SuccessResponse<?>> getRecentWiki() {
         return SuccessResponse.ok(wikiService.getRecentWiki());
     }

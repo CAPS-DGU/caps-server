@@ -30,7 +30,7 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String kakaoId;
 
-    @Column(length = 12, unique = true)
+    @Column(length = 20, unique = true)
     private String username;
 
     @Column
@@ -58,6 +58,9 @@ public class Member extends BaseTimeEntity {
     private String profileImageUrl;
 
     @Column(nullable = false)
+    private Integer point;
+
+    @Column(nullable = false)
     @ColumnDefault("false")
     private boolean registrationComplete;
 
@@ -76,6 +79,7 @@ public class Member extends BaseTimeEntity {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.profileImageUrl = profileImageUrl;
+        this.point = 0;
         this.registrationComplete = false;
         this.isDeleted = false;
     }

@@ -22,6 +22,7 @@ public class CorsConfig implements WebMvcConfigurer {
         // CORS 허용 URL
         List<String> allowedOrigins = Arrays.asList(
                 "http://localhost:8080/",
+                "http://localhost:5173/",
                 "https://dgucaps.kr/"
         );
         config.setAllowedOrigins(allowedOrigins);

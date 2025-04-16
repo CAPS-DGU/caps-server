@@ -60,8 +60,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private Cookie createCookie(String key, String value, int expireTime) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(expireTime);
-        // 개발환경에서 주석(https 적용시 true)
-//        cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         return cookie;

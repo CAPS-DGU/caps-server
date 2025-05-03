@@ -2,6 +2,7 @@ package kr.dgucaps.caps.global.config.auth.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.dgucaps.caps.domain.member.entity.Role;
@@ -28,20 +29,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final String accessToken = getAccessTokenFromHttpServletRequest(request);
-        jwtProvider.validateAccessToken(accessToken);
-        final Long memberId = jwtProvider.getSubject(accessToken);
-        final Role role = jwtProvider.getRole(accessToken);
-        setAuthentication(request, memberId, role);
+        String token = resolveToken(request);
+        if (token != null) {
+            // 유효성 검증
+            jwtProvider.validateAccessToken(token);
+            final Long memberId = jwtProvider.getSubject(token);
+            final Role role = jwtProvider.getRole(token);
+            // 인증 정보 설정
+            setAuthentication(request, memberId, role);
+        }
         filterChain.doFilter(request, response);
     }
 
-    private String getAccessTokenFromHttpServletRequest(HttpServletRequest request) {
-        String accessToken = request.getHeader(AUTHORIZATION);
-        if (StringUtils.hasText(accessToken) && accessToken.startsWith(BEARER)) {
-            return accessToken.substring(BEARER.length());
+    private String resolveToken(HttpServletRequest request) {
+        // Authorization 헤더에서 Bearer 토큰을 가져옴
+        String token = request.getHeader(AUTHORIZATION);
+        if (StringUtils.hasText(token) && token.startsWith(BEARER)) {
+            return token.substring(BEARER.length());
         }
-        throw new UnauthorizedException(ErrorCode.INVALID_ACCESS_TOKEN);
+        // 쿠키에서 accessToken을 가져옴
+        if (request.getCookies() != null) {
+            for (Cookie c : request.getCookies()) {
+                if ("accessToken".equals(c.getName())) {
+                    return c.getValue();
+                }
+            }
+        }
+        // Authorization 헤더와 쿠키 모두 없을 경우 예외 발생
+        return null;
     }
 
     private void setAuthentication(HttpServletRequest request, Long memberId, Role role) {

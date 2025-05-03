@@ -7,8 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.dgucaps.caps.domain.member.entity.Role;
 import kr.dgucaps.caps.global.config.auth.UserAuthentication;
-import kr.dgucaps.caps.global.error.ErrorCode;
-import kr.dgucaps.caps.global.error.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;

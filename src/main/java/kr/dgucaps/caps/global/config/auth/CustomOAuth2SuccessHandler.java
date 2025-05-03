@@ -1,7 +1,5 @@
 package kr.dgucaps.caps.global.config.auth;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.dgucaps.caps.domain.member.dto.CustomOAuth2User;
@@ -11,6 +9,7 @@ import kr.dgucaps.caps.domain.member.service.MemberService;
 import kr.dgucaps.caps.domain.member.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -37,14 +36,13 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private String onboardingRedirectUrl;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         CustomOAuth2User customUser = (CustomOAuth2User) authentication.getPrincipal();
         Member member = customUser.member();
 
         // 토큰 발급
         MemberTokenResponse tokenResponse = tokenService.issueToken(member.getId(), member.getRole());
-        response.addCookie(createCookie("accessToken", tokenResponse.accessToken(), ACCESS_TOKEN_EXPIRE_TIME));
-        response.addCookie(createCookie("refreshToken", tokenResponse.refreshToken(), REFRESH_TOKEN_EXPIRE_TIME));
+        writeTokenCookies(response, tokenResponse);
 
         // 마지막 로그인 시간 업데이트
         memberService.updateLastLogin(member);
@@ -57,12 +55,26 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         }
     }
 
-    private Cookie createCookie(String key, String value, int expireTime) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(expireTime);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        return cookie;
+    private void writeTokenCookies(HttpServletResponse response, MemberTokenResponse token) {
+        // 쿠키 설정
+         ResponseCookie accessToken = ResponseCookie.from("accessToken", token.accessToken())
+                .path("/")
+                .httpOnly(true)
+                .secure(true)                  // HTTPS 연결에서만 전송
+                .sameSite("None")              // 크로스사이트 요청에도 전송
+                .maxAge(ACCESS_TOKEN_EXPIRE_TIME)
+                .build();
+
+         ResponseCookie refreshToken = ResponseCookie.from("refreshToken", token.refreshToken())
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .maxAge(REFRESH_TOKEN_EXPIRE_TIME)
+                .build();
+
+        // 쿠키를 응답 헤더에 추가
+        response.addHeader("Set-Cookie", accessToken.toString());
+        response.addHeader("Set-Cookie", refreshToken.toString());
     }
 }

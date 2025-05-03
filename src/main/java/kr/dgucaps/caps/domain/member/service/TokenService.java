@@ -52,17 +52,16 @@ public class TokenService {
 
     public MemberTokenResponse issueToken(Long memberId, Role role) {
         String accessToken = jwtProvider.getIssueToken(memberId, role, true);
-        String redisKey = "RT:" + memberId;
-        Optional<RefreshToken> refreshToken = refreshTokenRepository.findById(redisKey);
+        Optional<RefreshToken> refreshToken = refreshTokenRepository.findById(memberId.toString());
         RefreshToken refreshTokenEntity;
         if (refreshToken.isPresent()) {
             refreshTokenEntity = refreshToken.get();
         } else {
             String newRefreshToken = issueNewRefreshToken(memberId);
-            refreshTokenEntity = new RefreshToken(redisKey, newRefreshToken);
+            refreshTokenEntity = new RefreshToken(memberId.toString(), newRefreshToken);
             refreshTokenRepository.save(refreshTokenEntity);
         }
-        return MemberTokenResponse.of(accessToken, refreshTokenEntity.getRefreshToken());
+        return MemberTokenResponse.of(accessToken, refreshTokenEntity.getToken());
     }
 
     public void reissue(String refreshToken, HttpServletResponse response) {
@@ -83,7 +82,7 @@ public class TokenService {
         // 저장된 refresh token을 조회
         RefreshToken refreshTokenEntity = refreshTokenRepository.findById(redisKey)
                 .orElseThrow(() -> new UnauthorizedException(NO_REFRESH_TOKEN));
-        String storedRefreshToken = refreshTokenEntity.getRefreshToken();
+        String storedRefreshToken = refreshTokenEntity.getToken();
 
         // 요청된 리프레시 토큰과 저장된 토큰 비교 검증
         jwtProvider.equalsRefreshToken(refreshToken, storedRefreshToken);
@@ -124,7 +123,6 @@ public class TokenService {
     }
 
     public void logout(Long memberId) {
-        String redisKey = "RT:" + memberId;
-        refreshTokenRepository.deleteById(redisKey);
+        refreshTokenRepository.deleteById(memberId.toString());
     }
 }

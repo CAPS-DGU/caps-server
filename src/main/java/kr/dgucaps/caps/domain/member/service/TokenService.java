@@ -1,7 +1,7 @@
 package kr.dgucaps.caps.domain.member.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import kr.dgucaps.caps.domain.member.dto.request.MemberTokenRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import kr.dgucaps.caps.domain.member.dto.response.MemberTokenResponse;
 import kr.dgucaps.caps.domain.member.entity.Role;
 import kr.dgucaps.caps.domain.member.repository.MemberRepository;
@@ -11,8 +11,11 @@ import kr.dgucaps.caps.global.config.auth.jwt.JwtProvider;
 import kr.dgucaps.caps.global.error.exception.EntityNotFoundException;
 import kr.dgucaps.caps.global.error.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -26,6 +29,12 @@ public class TokenService {
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    @Value("${jwt.access-token-expire-time}")
+    private int ACCESS_TOKEN_EXPIRE_TIME;
+
+    @Value("${jwt.refresh-token-expire-time}")
+    private int REFRESH_TOKEN_EXPIRE_TIME;
 
     public String issueNewAccessToken(Long memberId) {
         Role role = memberRepository.findById(memberId)
@@ -56,18 +65,20 @@ public class TokenService {
         return MemberTokenResponse.of(accessToken, refreshTokenEntity.getRefreshToken());
     }
 
-    public MemberTokenResponse reissue(MemberTokenRequest request) {
-        Long memberId;
-        try {
-            memberId = Long.valueOf(jwtProvider.decodeJwtPayloadSubject(request.accessToken()));
-        } catch (JsonProcessingException e) {
-            throw new UnauthorizedException(JSON_PARSING_FAILED);
+    public void reissue(String refreshToken, HttpServletResponse response) {
+        if (!StringUtils.hasText(refreshToken)) {
+            throw new UnauthorizedException(REFRESH_TOKEN_NOT_FOUND);
         }
-        String refreshToken = request.refreshToken();
-        String redisKey = String.valueOf(memberId);
 
         // 리프레시 토큰 검증 (리프레시 토큰 만료시 재로그인 필요)
         jwtProvider.validateRefreshToken(refreshToken);
+        Long memberId;
+        try {
+            memberId = Long.valueOf(jwtProvider.decodeJwtPayloadSubject(refreshToken));
+        } catch (JsonProcessingException e) {
+            throw new UnauthorizedException(JSON_PARSING_FAILED);
+        }
+        String redisKey = String.valueOf(memberId);
 
         // 저장된 refresh token을 조회
         RefreshToken refreshTokenEntity = refreshTokenRepository.findById(redisKey)
@@ -85,7 +96,31 @@ public class TokenService {
         RefreshToken updatedToken = new RefreshToken(redisKey, newRefreshToken);
         refreshTokenRepository.save(updatedToken);
 
-        return MemberTokenResponse.of(newAccessToken, newRefreshToken);
+        // 쿠키 설정
+        writeTokenCookies(response, newAccessToken, newRefreshToken);
+    }
+
+    private void writeTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
+        // 쿠키 설정
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken", accessToken)
+                .path("/")
+                .httpOnly(true)
+                .secure(true)                  // HTTPS 연결에서만 전송
+                .sameSite("None")              // 크로스사이트 요청에도 전송
+                .maxAge(ACCESS_TOKEN_EXPIRE_TIME)
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .maxAge(REFRESH_TOKEN_EXPIRE_TIME)
+                .build();
+
+        // 쿠키를 응답 헤더에 추가
+        response.addHeader("Set-Cookie", accessCookie.toString());
+        response.addHeader("Set-Cookie", refreshCookie.toString());
     }
 
     public void logout(Long memberId) {

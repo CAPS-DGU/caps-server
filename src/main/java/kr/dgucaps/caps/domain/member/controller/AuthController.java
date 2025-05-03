@@ -1,9 +1,8 @@
 package kr.dgucaps.caps.domain.member.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.dgucaps.caps.domain.member.dto.request.CompleteRegistrationRequest;
-import kr.dgucaps.caps.domain.member.dto.request.MemberTokenRequest;
-import kr.dgucaps.caps.domain.member.dto.response.MemberTokenResponse;
 import kr.dgucaps.caps.domain.member.service.AuthService;
 import kr.dgucaps.caps.domain.member.service.TokenService;
 import kr.dgucaps.caps.global.common.SuccessResponse;
@@ -36,8 +35,9 @@ public class AuthController implements AuthApi {
 
     // 리프레쉬 토큰 재발급
     @PostMapping("/reissue")
-    public ResponseEntity<SuccessResponse<?>> reissueToken(@RequestBody @Valid MemberTokenRequest request) {
-        MemberTokenResponse userToken = tokenService.reissue(request);
-        return SuccessResponse.ok(userToken);
+    public ResponseEntity<SuccessResponse<?>> reissueToken(@CookieValue(value = "refreshToken", required = false) String refreshToken,
+                                                           HttpServletResponse response) {
+        tokenService.reissue(refreshToken, response);
+        return SuccessResponse.noContent();
     }
 }

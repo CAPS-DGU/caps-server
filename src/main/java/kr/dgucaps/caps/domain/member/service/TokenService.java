@@ -105,7 +105,7 @@ public class TokenService {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)                  // HTTPS 연결에서만 전송
-                .sameSite("None")              // 크로스사이트 요청에도 전송
+                .sameSite("Lax")              // 크로스사이트 요청에도 전송
                 .maxAge(ACCESS_TOKEN_EXPIRE_TIME)
                 .build();
 
@@ -113,7 +113,7 @@ public class TokenService {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("None")
+                .sameSite("Lax")
                 .maxAge(REFRESH_TOKEN_EXPIRE_TIME)
                 .build();
 

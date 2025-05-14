@@ -7,14 +7,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Getter
 @Table(name = "wiki")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE wiki SET is_deleted = true WHERE id = ?")
 public class Wiki extends BaseTimeEntity {
 
     @Id
@@ -22,8 +22,8 @@ public class Wiki extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "editor_id", nullable = false)
+    private Member editor;
 
     @Column(nullable = false)
     private String title;
@@ -31,19 +31,15 @@ public class Wiki extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean isDeleted;
+
     @Builder
-    public Wiki(Member member, String title, String content) {
-        this.member = member;
+    public Wiki(Member editor, String title, String content) {
+        this.editor = editor;
         this.title = title;
         this.content = content;
-    }
-
-    @OneToMany(mappedBy = "wiki")
-    private List<WikiHistory> wikiHistories = new ArrayList<>();
-
-    public void updateWiki(Member member, String title, String content) {
-        this.member = member;
-        this.title = title;
-        this.content = content;
+        this.isDeleted = false;
     }
 }

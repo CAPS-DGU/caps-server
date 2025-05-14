@@ -3,6 +3,7 @@ package kr.dgucaps.caps.domain.member.entity;
 import jakarta.persistence.*;
 import kr.dgucaps.caps.domain.common.entity.BaseTimeEntity;
 import kr.dgucaps.caps.domain.wiki.entity.Wiki;
+import kr.dgucaps.caps.domain.wiki.entity.WikiHistory;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -84,8 +85,11 @@ public class Member extends BaseTimeEntity {
         this.isDeleted = false;
     }
 
-    @OneToMany(mappedBy = "editor")
+    @OneToMany(mappedBy = "member")
     List<Wiki> wikis = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    List<WikiHistory> wikiHistories = new ArrayList<>();
 
     public void completeRegistration(String studentNumber, float grade) {
         this.studentNumber = studentNumber;

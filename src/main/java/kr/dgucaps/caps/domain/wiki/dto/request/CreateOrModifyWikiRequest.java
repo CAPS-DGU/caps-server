@@ -10,7 +10,7 @@ public record CreateOrModifyWikiRequest(
 ) {
     public Wiki toEntity(Member member) {
         return Wiki.builder()
-                .editor(member)
+                .member(member)
                 .title(title)
                 .content(content)
                 .build();

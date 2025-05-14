@@ -8,8 +8,6 @@ import kr.dgucaps.caps.domain.wiki.dto.request.CreateOrModifyWikiRequest;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiResponse;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiTitleResponse;
 import kr.dgucaps.caps.domain.wiki.entity.Wiki;
-import kr.dgucaps.caps.domain.wiki.entity.WikiHistory;
-import kr.dgucaps.caps.domain.wiki.repository.WikiHistoryRepository;
 import kr.dgucaps.caps.domain.wiki.repository.WikiRepository;
 import kr.dgucaps.caps.global.error.ErrorCode;
 import kr.dgucaps.caps.global.error.exception.EntityNotFoundException;
@@ -31,43 +29,27 @@ public class WikiService {
     private final WikiRepository wikiRepository;
     private final MemberRepository memberRepository;
     private final AutocompleteService autocompleteService;
-    private final WikiHistoryRepository wikiHistoryRepository;
 
     @Transactional
-    public WikiResponse createWiki(Long memberId, CreateOrModifyWikiRequest request) {
+    public WikiResponse createOrModifyWiki(Long memberId, CreateOrModifyWikiRequest request) {
+        if (wikiRepository.existsByTitleAndIsDeletedFalse(request.title())) {
+            wikiRepository.deleteByTitleAndIsDeletedFalse(request.title());
+        }
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         Wiki savedWiki = wikiRepository.save(request.toEntity(member));
         return WikiResponse.from(savedWiki);
     }
 
-    @Transactional
-    public WikiResponse modifyWiki(Long memberId, CreateOrModifyWikiRequest request) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-        Wiki wiki = wikiRepository.findByTitle(request.title())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.WIKI_NOT_FOUND));
-        WikiHistory wikiHistory = WikiHistory.builder()
-                .wiki(wiki)
-                .member(wiki.getMember())
-                .title(wiki.getTitle())
-                .content(wiki.getContent())
-                .build();
-        wikiHistoryRepository.save(wikiHistory);
-        wiki.updateWiki(member, request.title(), request.content());
-        Wiki updatedWiki = wikiRepository.save(wiki);
-        return WikiResponse.from(updatedWiki);
-    }
-
     public WikiResponse getWiki(String title) {
-        Wiki wiki = wikiRepository.findByTitle(title)
+        Wiki wiki = wikiRepository.findByTitleAndIsDeletedFalse(title)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.WIKI_NOT_FOUND));
         return WikiResponse.from(wiki);
     }
 
     public List<WikiResponse> getWikiHistory(String title) {
-        List<WikiHistory> wikiHistories = wikiHistoryRepository.findByTitleOrderByCreatedAtDesc(title);
-        return wikiHistories.stream()
+        List<Wiki> wikiHistory = wikiRepository.findByTitleOrderByCreatedAtDesc(title);
+        return wikiHistory.stream()
                 .map(WikiResponse::from)
                 .collect(Collectors.toList());
     }
@@ -79,7 +61,7 @@ public class WikiService {
     }
 
     public List<WikiTitleResponse> getRecentWiki() {
-        List<Wiki> recentWikis = wikiRepository.findFirst10ByOrderByUpdatedAtDesc();
+        List<Wiki> recentWikis = wikiRepository.findFirst10ByIsDeletedFalseOrderByCreatedAtDesc();
         return recentWikis.stream()
                 .map(WikiTitleResponse::from)
                 .collect(Collectors.toList());

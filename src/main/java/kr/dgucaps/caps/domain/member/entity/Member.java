@@ -84,7 +84,7 @@ public class Member extends BaseTimeEntity {
         this.isDeleted = false;
     }
 
-    @OneToMany(mappedBy = "editor")
+    @OneToMany(mappedBy = "member")
     List<Wiki> wikis = new ArrayList<>();
 
     public void completeRegistration(String studentNumber, float grade) {

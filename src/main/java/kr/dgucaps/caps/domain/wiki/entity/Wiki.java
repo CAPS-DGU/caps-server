@@ -22,8 +22,8 @@ public class Wiki extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "editor_id", nullable = false)
-    private Member editor;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Column(nullable = false)
     private String title;
@@ -36,8 +36,8 @@ public class Wiki extends BaseTimeEntity {
     private boolean isDeleted;
 
     @Builder
-    public Wiki(Member editor, String title, String content) {
-        this.editor = editor;
+    public Wiki(Member member, String title, String content) {
+        this.member = member;
         this.title = title;
         this.content = content;
         this.isDeleted = false;

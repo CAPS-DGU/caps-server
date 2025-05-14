@@ -21,15 +21,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface WikiApi {
 
     @Operation(
-            summary = "위키 작성 & 수정",
-            description = "위키를 작성하거나 수정합니다.  \n" +
-                    "title이 존재하지 않으면 새로 작성하고, 존재하면 수정합니다."
+            summary = "위키 작성",
+            description = "위키를 작성합니다."
     )
-    @ApiResponse(responseCode = "200", description = "위키 작성/수정 성공",
+    @ApiResponse(responseCode = "200", description = "위키 작성 성공",
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = WikiResponse.class))
     )
     ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal Long memberId,
+                                                  @Valid @RequestBody CreateOrModifyWikiRequest request);
+
+    @Operation(
+            summary = "위키 수정",
+            description = "위키를 수정합니다."
+    )
+    @ApiResponse(responseCode = "200", description = "위키 수정 성공",
+            content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = WikiResponse.class))
+    )
+    ResponseEntity<SuccessResponse<?>> modifyWiki(@AuthenticationPrincipal Long memberId,
                                                   @Valid @RequestBody CreateOrModifyWikiRequest request);
 
     @Operation(

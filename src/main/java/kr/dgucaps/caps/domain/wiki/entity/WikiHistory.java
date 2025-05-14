@@ -8,18 +8,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
-@Table(name = "wiki")
+@Table(name = "wiki_history")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Wiki extends BaseTimeEntity {
+public class WikiHistory extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "wiki_id", nullable = false)
+    private Wiki wiki;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -32,16 +33,8 @@ public class Wiki extends BaseTimeEntity {
     private String content;
 
     @Builder
-    public Wiki(Member member, String title, String content) {
-        this.member = member;
-        this.title = title;
-        this.content = content;
-    }
-
-    @OneToMany(mappedBy = "wiki")
-    private List<WikiHistory> wikiHistories = new ArrayList<>();
-
-    public void updateWiki(Member member, String title, String content) {
+    public WikiHistory(Wiki wiki, Member member, String title, String content) {
+        this.wiki = wiki;
         this.member = member;
         this.title = title;
         this.content = content;

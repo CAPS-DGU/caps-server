@@ -17,7 +17,7 @@ public record WikiResponse(
         return WikiResponse.builder()
                 .title(wiki.getTitle())
                 .content(wiki.getContent())
-                .editor(MemberSummary.from(wiki.getEditor()))
+                .editor(MemberSummary.from(wiki.getMember()))
                 .createdAt(wiki.getCreatedAt())
                 .build();
     }

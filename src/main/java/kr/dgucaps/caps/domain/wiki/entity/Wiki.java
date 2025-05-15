@@ -32,14 +32,18 @@ public class Wiki extends BaseTimeEntity {
     private String content;
 
     @Column(nullable = false)
+    private String jamo;
+
+    @Column(nullable = false)
     @ColumnDefault("false")
     private boolean isDeleted;
 
     @Builder
-    public Wiki(Member editor, String title, String content) {
+    public Wiki(Member editor, String title, String content, String jamo) {
         this.editor = editor;
         this.title = title;
         this.content = content;
+        this.jamo = jamo;
         this.isDeleted = false;
     }
 }

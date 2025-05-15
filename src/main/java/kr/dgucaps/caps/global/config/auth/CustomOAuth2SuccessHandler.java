@@ -35,6 +35,9 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     @Value("${app.auth.redirect.onboarding}")
     private String onboardingRedirectUrl;
 
+    @Value("${app.auth.cookie.domain}")
+    private String cookieDomain;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         CustomOAuth2User customUser = (CustomOAuth2User) authentication.getPrincipal();
@@ -57,20 +60,22 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
     private void writeTokenCookies(HttpServletResponse response, MemberTokenResponse token) {
         // 쿠키 설정
-         ResponseCookie accessToken = ResponseCookie.from("accessToken", token.accessToken())
+        ResponseCookie accessToken = ResponseCookie.from("accessToken", token.accessToken())
                 .path("/")
                 .httpOnly(true)
                 .secure(true)                  // HTTPS 연결에서만 전송
                 .sameSite("Lax")              // 크로스사이트 요청에도 전송
                 .maxAge(ACCESS_TOKEN_EXPIRE_TIME)
+                .domain(cookieDomain)
                 .build();
 
-         ResponseCookie refreshToken = ResponseCookie.from("refreshToken", token.refreshToken())
+        ResponseCookie refreshToken = ResponseCookie.from("refreshToken", token.refreshToken())
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Lax")
                 .maxAge(REFRESH_TOKEN_EXPIRE_TIME)
+                .domain(cookieDomain)
                 .build();
 
         // 쿠키를 응답 헤더에 추가

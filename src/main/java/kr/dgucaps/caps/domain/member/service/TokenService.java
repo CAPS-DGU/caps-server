@@ -36,6 +36,9 @@ public class TokenService {
     @Value("${jwt.refresh-token-expire-time}")
     private int REFRESH_TOKEN_EXPIRE_TIME;
 
+    @Value("${app.auth.cookie.domain}")
+    private String cookieDomain;
+
     public String issueNewAccessToken(Long memberId) {
         Role role = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(MEMBER_NOT_FOUND))
@@ -107,6 +110,7 @@ public class TokenService {
                 .secure(true)                  // HTTPS 연결에서만 전송
                 .sameSite("Lax")              // 크로스사이트 요청에도 전송
                 .maxAge(ACCESS_TOKEN_EXPIRE_TIME)
+                .domain(cookieDomain)
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
@@ -115,6 +119,7 @@ public class TokenService {
                 .secure(true)
                 .sameSite("Lax")
                 .maxAge(REFRESH_TOKEN_EXPIRE_TIME)
+                .domain(cookieDomain)
                 .build();
 
         // 쿠키를 응답 헤더에 추가

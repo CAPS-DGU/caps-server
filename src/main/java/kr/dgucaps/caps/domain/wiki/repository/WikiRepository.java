@@ -3,7 +3,6 @@ package kr.dgucaps.caps.domain.wiki.repository;
 import kr.dgucaps.caps.domain.wiki.entity.Wiki;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,7 +24,6 @@ public interface WikiRepository extends JpaRepository<Wiki, Long> {
 
     List<Wiki> findFirst10ByIsDeletedFalseOrderByCreatedAtDesc();
 
-    @Query("SELECT w.jamo FROM Wiki w WHERE w.isDeleted = false AND w.jamo LIKE %:input% ORDER BY w.jamo ASC LIMIT 7")
-    List<Wiki> findAutocompleteWiki(@Param("input") String input);
+    List<Wiki> findByJamoStartsWith(String jamo);
 
 }

@@ -62,7 +62,7 @@ public class WikiService {
     }
 
     public List<WikiTitleResponse> getAutocompleteWiki(String input) {
-        List<Wiki> autocompleteWikis = wikiRepository.findAutocompleteWiki(input); //title?Wiki?로 반환해야함
+        List<Wiki> autocompleteWikis = wikiRepository.findByJamoStartsWith(input);
         return autocompleteWikis.stream()
                 .map(WikiTitleResponse::from)
                 .collect(Collectors.toList());

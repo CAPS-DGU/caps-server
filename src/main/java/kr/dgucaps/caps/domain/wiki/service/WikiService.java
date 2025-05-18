@@ -1,24 +1,20 @@
 package kr.dgucaps.caps.domain.wiki.service;
 
-import jakarta.annotation.PostConstruct;
 import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.member.repository.MemberRepository;
-import kr.dgucaps.caps.domain.redis.service.AutocompleteService;
 import kr.dgucaps.caps.domain.wiki.dto.request.CreateOrModifyWikiRequest;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiResponse;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiTitleResponse;
 import kr.dgucaps.caps.domain.wiki.entity.Wiki;
 import kr.dgucaps.caps.domain.wiki.repository.WikiRepository;
+import kr.dgucaps.caps.domain.wiki.util.WikiJamoUtils;
 import kr.dgucaps.caps.global.error.ErrorCode;
 import kr.dgucaps.caps.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +24,6 @@ public class WikiService {
 
     private final WikiRepository wikiRepository;
     private final MemberRepository memberRepository;
-    private final AutocompleteService autocompleteService;
 
     @Transactional
     public WikiResponse createOrModifyWiki(Long memberId, CreateOrModifyWikiRequest request) {
@@ -67,31 +62,21 @@ public class WikiService {
                 .collect(Collectors.toList());
     }
 
-    private String suffix = "*";
-    private int maxSize = 5;
-    @PostConstruct
-    public void init() {
-        saveAllSubstring(wikiRepository.findAllTitle());
+    public List<WikiTitleResponse> getAutocompleteWiki(String input) {
+        List<Wiki> autocompleteWikis = wikiRepository.findByJamoStartsWith(input);
+        return autocompleteWikis.stream()
+                .map(WikiTitleResponse::from)
+                .collect(Collectors.toList());
     }
-    private void saveAllSubstring(List<String> allTitle) {
-        for (String title : allTitle) {
-            autocompleteService.addToSortedSet(title + suffix);
-            for (int i = title.length(); i > 0; --i) {
-                autocompleteService.addToSortedSet(title.substring(0, i));
-            }
+
+    // 배포 후 삭제
+    @Transactional
+    public void updateExistingDataJamo() {
+        List<Wiki> wikis = wikiRepository.findAll();
+        for (Wiki wiki : wikis) {
+            String jamo = WikiJamoUtils.convertToJamo(wiki.getTitle());
+            wiki.updateJamo(jamo);
+            wikiRepository.save(wiki);
         }
-    }
-    public List<String> autocorrect(String keyword) {
-        Long index = autocompleteService.findFromSortedSet(keyword);
-        if (index == null) {
-            return new ArrayList<>();
-        }
-        Set<String> allValuesAfterIndexFromSortedSet = autocompleteService.findAllValuesAfterIndexFromSortedSet(index);
-        List<String> autocorrectKeywords = allValuesAfterIndexFromSortedSet.stream()
-                .filter(value -> value.endsWith(suffix) && value.startsWith(keyword))
-                .map(value -> StringUtils.removeEnd(value, suffix))
-                .limit(maxSize)
-                .toList();
-        return autocorrectKeywords;
     }
 }

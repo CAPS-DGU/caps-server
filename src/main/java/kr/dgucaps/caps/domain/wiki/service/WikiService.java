@@ -7,6 +7,7 @@ import kr.dgucaps.caps.domain.wiki.dto.response.WikiResponse;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiTitleResponse;
 import kr.dgucaps.caps.domain.wiki.entity.Wiki;
 import kr.dgucaps.caps.domain.wiki.repository.WikiRepository;
+import kr.dgucaps.caps.domain.wiki.util.WikiJamoUtils;
 import kr.dgucaps.caps.global.error.ErrorCode;
 import kr.dgucaps.caps.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -68,4 +69,14 @@ public class WikiService {
                 .collect(Collectors.toList());
     }
 
+    // 배포 후 삭제
+    @Transactional
+    public void updateExistingDataJamo() {
+        List<Wiki> wikis = wikiRepository.findAll();
+        for (Wiki wiki : wikis) {
+            String jamo = WikiJamoUtils.convertToJamo(wiki.getTitle());
+            wiki.updateJamo(jamo);
+            wikiRepository.save(wiki);
+        }
+    }
 }

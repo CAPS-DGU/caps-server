@@ -32,7 +32,8 @@ public class Wiki extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false)
+    // 배포 후 false로 변경
+    @Column(nullable = true)
     private String jamo;
 
     @Column(nullable = false)
@@ -50,5 +51,10 @@ public class Wiki extends BaseTimeEntity {
         this.title = title;
         this.content = content;
         this.isDeleted = false;
+    }
+
+    // 배포 후 false로 변경
+    public void updateJamo(String jamo) {
+        this.jamo = jamo;
     }
 }

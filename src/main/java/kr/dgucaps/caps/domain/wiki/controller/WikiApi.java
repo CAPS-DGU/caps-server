@@ -77,17 +77,4 @@ public interface WikiApi {
                             schema = @Schema(implementation = WikiTitleResponse.class)))
     )
     ResponseEntity<SuccessResponse<?>> getRecentWiki();
-
-    @Operation(
-            summary = "위키 검색어 자동완성",
-            description = "검색어에 해당하는 위키 7개를 자동완성하여 응답합니다"
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "위키 검색어 자동완성 조회 성공",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = WikiTitleResponse.class))),
-            @ApiResponse(responseCode = "404", description = "위키를 찾을 수 없음")
-    })
-    ResponseEntity<SuccessResponse<?>> getAutocompleteWiki(@PathVariable(value = "title") String title);
-
 }

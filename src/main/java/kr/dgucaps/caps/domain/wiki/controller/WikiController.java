@@ -43,10 +43,4 @@ public class WikiController implements WikiApi {
     public ResponseEntity<SuccessResponse<?>> getRecentWiki() {
         return SuccessResponse.ok(wikiService.getRecentWiki());
     }
-
-    @GetMapping("/autocomplete")
-    public ResponseEntity<SuccessResponse<?>> getAutocompleteWiki(@RequestParam String input) {
-        return SuccessResponse.ok(wikiService.getAutocompleteWiki(input));
-    }
-
 }

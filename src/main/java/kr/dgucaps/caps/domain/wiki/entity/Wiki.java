@@ -3,7 +3,6 @@ package kr.dgucaps.caps.domain.wiki.entity;
 import jakarta.persistence.*;
 import kr.dgucaps.caps.domain.common.entity.BaseTimeEntity;
 import kr.dgucaps.caps.domain.member.entity.Member;
-import kr.dgucaps.caps.domain.wiki.util.WikiJamoUtils;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,18 +31,9 @@ public class Wiki extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    // 배포 후 false로 변경
-    @Column(nullable = true)
-    private String jamo;
-
     @Column(nullable = false)
     @ColumnDefault("false")
     private boolean isDeleted;
-
-    @PrePersist
-    public void initJamo(){
-        this.jamo = WikiJamoUtils.convertToJamo(this.title);
-    }
 
     @Builder
     public Wiki(Member editor, String title, String content) {
@@ -51,10 +41,5 @@ public class Wiki extends BaseTimeEntity {
         this.title = title;
         this.content = content;
         this.isDeleted = false;
-    }
-
-    // 배포 후 false로 변경
-    public void updateJamo(String jamo) {
-        this.jamo = jamo;
     }
 }

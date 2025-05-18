@@ -24,6 +24,6 @@ public interface WikiRepository extends JpaRepository<Wiki, Long> {
 
     List<Wiki> findFirst10ByIsDeletedFalseOrderByCreatedAtDesc();
 
-    List<Wiki> findByJamoStartsWith(String jamo);
-
+    @Query("SELECT w.title FROM Wiki w WHERE w.isDeleted = false")
+    List<String> findAllTitle();
 }

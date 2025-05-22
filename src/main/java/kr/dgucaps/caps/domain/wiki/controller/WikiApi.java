@@ -25,10 +25,12 @@ public interface WikiApi {
             summary = "위키 작성",
             description = "위키를 작성합니다."
     )
-    @ApiResponse(responseCode = "200", description = "위키 작성 성공",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = WikiResponse.class))
-    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "위키 작성 성공",
+                content = @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = WikiResponse.class))),
+        @ApiResponse(responseCode = "409", description = "이미 존재하는 위키 제목")
+    })
     ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal(expression = "member") Member member,
                                                   @Valid @RequestBody CreateOrModifyWikiRequest request);
 

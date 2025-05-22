@@ -9,9 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.dgucaps.caps.domain.member.dto.request.CompleteRegistrationRequest;
-import kr.dgucaps.caps.domain.member.dto.request.MemberTokenRequest;
+import kr.dgucaps.caps.domain.member.dto.response.AuthInfoResponse;
 import kr.dgucaps.caps.domain.member.dto.response.MemberInfoResponse;
-import kr.dgucaps.caps.domain.member.dto.response.MemberTokenResponse;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -54,4 +53,16 @@ public interface AuthApi {
     })
     ResponseEntity<SuccessResponse<?>> reissueToken(@CookieValue(value = "refreshToken", required = false) String refreshToken,
                                                            HttpServletResponse response);
+
+    @Operation(
+            summary = "인증 정보 조회",
+            description = "현재 로그인한 사용자의 인증 정보 및 온보딩 완료 여부를 조회합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "인증 정보 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AuthInfoResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증 정보가 없음")
+    })
+    ResponseEntity<SuccessResponse<?>> getAuthInfo(@AuthenticationPrincipal Long memberId);
 }

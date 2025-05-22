@@ -40,4 +40,9 @@ public class AuthController implements AuthApi {
         tokenService.reissue(refreshToken, response);
         return SuccessResponse.noContent();
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<SuccessResponse<?>> getAuthInfo(@AuthenticationPrincipal Long memberId) {
+        return SuccessResponse.ok(authService.getAuthInfo(memberId));
+    }
 }

@@ -3,6 +3,7 @@ package kr.dgucaps.caps.domain.member.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.dgucaps.caps.domain.member.dto.request.CompleteRegistrationRequest;
+import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.member.service.AuthService;
 import kr.dgucaps.caps.domain.member.service.TokenService;
 import kr.dgucaps.caps.global.common.SuccessResponse;
@@ -21,15 +22,15 @@ public class AuthController implements AuthApi {
 
     // 회원가입 후 추가 정보 입력
     @PatchMapping("/complete-registration")
-    public ResponseEntity<SuccessResponse<?>> completeRegistration(@AuthenticationPrincipal Long memberId,
+    public ResponseEntity<SuccessResponse<?>> completeRegistration(@AuthenticationPrincipal(expression = "member") Member member,
                                                                    @RequestBody @Valid CompleteRegistrationRequest request) {
-        return SuccessResponse.ok(authService.completeRegistration(memberId, request));
+        return SuccessResponse.ok(authService.completeRegistration(member, request));
     }
 
     // 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal Long userId) {
-        tokenService.logout(userId);
+    public ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal(expression = "member") Member member) {
+        tokenService.logout(member);
         return SuccessResponse.noContent();
     }
 
@@ -42,7 +43,7 @@ public class AuthController implements AuthApi {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<SuccessResponse<?>> getAuthInfo(@AuthenticationPrincipal Long memberId) {
-        return SuccessResponse.ok(authService.getAuthInfo(memberId));
+    public ResponseEntity<SuccessResponse<?>> getAuthInfo(@AuthenticationPrincipal(expression = "member") Member member) {
+        return SuccessResponse.ok(authService.getAuthInfo(member));
     }
 }

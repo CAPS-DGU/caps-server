@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.dgucaps.caps.domain.member.dto.request.UpdateMemberRequest;
 import kr.dgucaps.caps.domain.member.dto.response.MemberInfoResponse;
+import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,7 +27,7 @@ public interface MemberApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = MemberInfoResponse.class))
     )
-    ResponseEntity<SuccessResponse<?>> getMemberInfo(@AuthenticationPrincipal Long memberId);
+    ResponseEntity<SuccessResponse<?>> getMemberInfo(@AuthenticationPrincipal(expression = "member") Member member);
 
     @Operation(
             summary = "다른 회원 정보 조회",
@@ -49,6 +50,6 @@ public interface MemberApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = MemberInfoResponse.class))
     )
-    ResponseEntity<SuccessResponse<?>> updateMember(@AuthenticationPrincipal Long memberId,
+    ResponseEntity<SuccessResponse<?>> updateMember(@AuthenticationPrincipal(expression = "member") Member member,
                                                     @Valid @RequestBody UpdateMemberRequest request);
 }

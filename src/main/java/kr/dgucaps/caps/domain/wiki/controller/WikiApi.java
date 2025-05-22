@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.wiki.dto.request.CreateOrModifyWikiRequest;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiResponse;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiTitleResponse;
@@ -28,7 +29,7 @@ public interface WikiApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = WikiResponse.class))
     )
-    ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal Long memberId,
+    ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal(expression = "member") Member member,
                                                   @Valid @RequestBody CreateOrModifyWikiRequest request);
 
     @Operation(
@@ -39,7 +40,7 @@ public interface WikiApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = WikiResponse.class))
     )
-    ResponseEntity<SuccessResponse<?>> modifyWiki(@AuthenticationPrincipal Long memberId,
+    ResponseEntity<SuccessResponse<?>> modifyWiki(@AuthenticationPrincipal(expression = "member") Member member,
                                                   @Valid @RequestBody CreateOrModifyWikiRequest request);
 
     @Operation(

@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import kr.dgucaps.caps.domain.member.dto.request.CompleteRegistrationRequest;
 import kr.dgucaps.caps.domain.member.dto.response.AuthInfoResponse;
 import kr.dgucaps.caps.domain.member.dto.response.MemberInfoResponse;
+import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,7 +29,7 @@ public interface AuthApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = MemberInfoResponse.class))
     )
-    ResponseEntity<SuccessResponse<?>> completeRegistration(@AuthenticationPrincipal Long memberId,
+    ResponseEntity<SuccessResponse<?>> completeRegistration(@AuthenticationPrincipal(expression = "member") Member member,
                                                                    @RequestBody @Valid CompleteRegistrationRequest request);
 
     @Operation(
@@ -38,7 +39,7 @@ public interface AuthApi {
                     "클라이언트의 액세스, 리프레쉬 토큰을 삭제해야합니다."
     )
     @ApiResponse(responseCode = "204", description = "로그아웃 성공")
-    ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal Long userId);
+    ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal(expression = "member") Member member);
 
     @Operation(
             summary = "토큰 재발급",
@@ -64,5 +65,5 @@ public interface AuthApi {
                             schema = @Schema(implementation = AuthInfoResponse.class))),
             @ApiResponse(responseCode = "401", description = "인증 정보가 없음")
     })
-    ResponseEntity<SuccessResponse<?>> getAuthInfo(@AuthenticationPrincipal Long memberId);
+    ResponseEntity<SuccessResponse<?>> getAuthInfo(@AuthenticationPrincipal(expression = "member") Member member);
 }

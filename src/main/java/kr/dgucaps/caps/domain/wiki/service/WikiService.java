@@ -81,7 +81,7 @@ public class WikiService {
     }
 
     public List<WikiTitleResponse> getAutocompleteWiki(String input) {
-        List<Wiki> autocompleteWikis = wikiRepository.findByJamoStartsWith(input);
+        List<Wiki> autocompleteWikis = wikiRepository.findByJamoStartsWith(WikiJamoUtils.convertToJamo(input));
         return autocompleteWikis.stream()
                 .map(WikiTitleResponse::from)
                 .collect(Collectors.toList());

@@ -1,5 +1,6 @@
 package kr.dgucaps.caps.global.config.auth;
 
+import kr.dgucaps.caps.domain.member.repository.MemberRepository;
 import kr.dgucaps.caps.domain.member.service.KakaoOAuth2UserService;
 import kr.dgucaps.caps.global.config.CorsConfig;
 import kr.dgucaps.caps.global.config.auth.jwt.JwtAuthenticationEntryPoint;
@@ -8,6 +9,7 @@ import kr.dgucaps.caps.global.config.auth.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -18,9 +20,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@RequiredArgsConstructor
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
@@ -28,6 +31,7 @@ public class SecurityConfig {
     private final KakaoOAuth2UserService kakaoOAuth2UserService;
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
     private final CorsConfig corsConfig;
+    private final MemberRepository memberRepository;
 
     // 토큰 없이 접근 가능한 URL
     private static final String[] whiteList = {"/",
@@ -70,7 +74,7 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
                 .addFilter(corsConfig.corsFilter())
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, memberRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class)
                 .build();
     }

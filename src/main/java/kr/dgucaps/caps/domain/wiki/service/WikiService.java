@@ -1,7 +1,6 @@
 package kr.dgucaps.caps.domain.wiki.service;
 
 import kr.dgucaps.caps.domain.member.entity.Member;
-import kr.dgucaps.caps.domain.member.repository.MemberRepository;
 import kr.dgucaps.caps.domain.wiki.dto.request.CreateOrModifyWikiRequest;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiResponse;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiTitleResponse;
@@ -11,6 +10,7 @@ import kr.dgucaps.caps.domain.wiki.repository.WikiHistoryRepository;
 import kr.dgucaps.caps.domain.wiki.repository.WikiRepository;
 import kr.dgucaps.caps.domain.wiki.util.WikiJamoUtils;
 import kr.dgucaps.caps.global.error.ErrorCode;
+import kr.dgucaps.caps.global.error.exception.ConflictException;
 import kr.dgucaps.caps.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,21 +25,19 @@ import java.util.stream.Collectors;
 public class WikiService {
 
     private final WikiRepository wikiRepository;
-    private final MemberRepository memberRepository;
     private final WikiHistoryRepository wikiHistoryRepository;
 
     @Transactional
-    public WikiResponse createWiki(Long memberId, CreateOrModifyWikiRequest request) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+    public WikiResponse createWiki(Member member, CreateOrModifyWikiRequest request) {
+        if (wikiRepository.existsByTitle(request.title())) {
+            throw new ConflictException(ErrorCode.WIKI_ALREADY_EXISTS);
+        }
         Wiki savedWiki = wikiRepository.save(request.toEntity(member));
         return WikiResponse.from(savedWiki);
     }
 
     @Transactional
-    public WikiResponse modifyWiki(Long memberId, CreateOrModifyWikiRequest request) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+    public WikiResponse modifyWiki(Member member, CreateOrModifyWikiRequest request) {
         Wiki wiki = wikiRepository.findByTitle(request.title())
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.WIKI_NOT_FOUND));
         WikiHistory wikiHistory = WikiHistory.builder()

@@ -1,6 +1,7 @@
 package kr.dgucaps.caps.domain.wiki.controller;
 
 import jakarta.validation.Valid;
+import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.wiki.dto.request.CreateOrModifyWikiRequest;
 import kr.dgucaps.caps.domain.wiki.service.WikiService;
 import kr.dgucaps.caps.global.common.SuccessResponse;
@@ -19,16 +20,16 @@ public class WikiController implements WikiApi {
 
     @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @PostMapping
-    public ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal Long memberId,
+    public ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal(expression = "member") Member member,
                                                          @Valid @RequestBody CreateOrModifyWikiRequest request) {
-        return SuccessResponse.ok(wikiService.createWiki(memberId, request));
+        return SuccessResponse.ok(wikiService.createWiki(member, request));
     }
 
     @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @PatchMapping
-    public ResponseEntity<SuccessResponse<?>> modifyWiki(@AuthenticationPrincipal Long memberId,
+    public ResponseEntity<SuccessResponse<?>> modifyWiki(@AuthenticationPrincipal(expression = "member") Member member,
                                                          @Valid @RequestBody CreateOrModifyWikiRequest request) {
-        return SuccessResponse.ok(wikiService.modifyWiki(memberId, request));
+        return SuccessResponse.ok(wikiService.modifyWiki(member, request));
     }
 
     @GetMapping("/{title}")

@@ -3,6 +3,7 @@ package kr.dgucaps.caps.domain.member.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.dgucaps.caps.domain.member.dto.response.MemberTokenResponse;
+import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.member.entity.Role;
 import kr.dgucaps.caps.domain.member.repository.MemberRepository;
 import kr.dgucaps.caps.domain.redis.entity.RefreshToken;
@@ -127,7 +128,7 @@ public class TokenService {
         response.addHeader("Set-Cookie", refreshCookie.toString());
     }
 
-    public void logout(Long memberId) {
-        refreshTokenRepository.deleteById(memberId.toString());
+    public void logout(Member member) {
+        refreshTokenRepository.deleteById(member.getId().toString());
     }
 }

@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -92,6 +94,16 @@ public class GlobalExceptionHandler {
         log.error(">>> handle: MaxUploadSizeExceededException (파일 크기 초과)", e);
         final ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.FILE_SIZE_EXCEEDED);
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(errorResponse);
+    }
+
+    /**
+     * 권한이 없는 사용자가 접근할 때 발생하는 error를 handling합니다.
+     */
+    @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
+    protected ResponseEntity<ErrorResponse> handleAccessDeniedException(Exception e) {
+        log.warn(">>> handle: AccessDeniedException or AuthorizationDeniedException", e);
+        final ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.FORBIDDEN);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 
     /**

@@ -41,7 +41,8 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M002", "사용자가 존재하지 않습니다."),
 
     // Wiki
-    WIKI_NOT_FOUND(HttpStatus.NOT_FOUND, "W001", "위키가 존재하지 않습니다.")
+    WIKI_NOT_FOUND(HttpStatus.NOT_FOUND, "W001", "위키가 존재하지 않습니다."),
+    WIKI_ALREADY_EXISTS(HttpStatus.CONFLICT, "W002", "이미 존재하는 위키입니다."),
     ;
 
     private final HttpStatus httpStatus;

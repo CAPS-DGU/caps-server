@@ -1,11 +1,10 @@
 package kr.dgucaps.caps.domain.member.service;
 
 import kr.dgucaps.caps.domain.member.dto.request.CompleteRegistrationRequest;
+import kr.dgucaps.caps.domain.member.dto.response.AuthInfoResponse;
 import kr.dgucaps.caps.domain.member.dto.response.MemberInfoResponse;
 import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.member.repository.MemberRepository;
-import kr.dgucaps.caps.global.error.ErrorCode;
-import kr.dgucaps.caps.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +17,13 @@ public class AuthService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public MemberInfoResponse completeRegistration(Long memberId, CompleteRegistrationRequest request) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+    public MemberInfoResponse completeRegistration(Member member, CompleteRegistrationRequest request) {
         member.completeRegistration(request.studentNumber(), request.grade());
         Member savedMember = memberRepository.save(member);
         return MemberInfoResponse.from(savedMember);
+    }
+
+    public AuthInfoResponse getAuthInfo(Member member) {
+        return AuthInfoResponse.of(member);
     }
 }

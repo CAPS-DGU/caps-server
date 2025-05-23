@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.wiki.dto.request.CreateOrModifyWikiRequest;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiResponse;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiTitleResponse;
@@ -24,11 +25,13 @@ public interface WikiApi {
             summary = "위키 작성",
             description = "위키를 작성합니다."
     )
-    @ApiResponse(responseCode = "201", description = "위키 작성 성공",
-            content = @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = WikiResponse.class))
-    )
-    ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal Long memberId,
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "위키 작성 성공",
+                content = @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = WikiResponse.class))),
+        @ApiResponse(responseCode = "409", description = "이미 존재하는 위키 제목")
+    })
+    ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal(expression = "member") Member member,
                                                   @Valid @RequestBody CreateOrModifyWikiRequest request);
 
     @Operation(
@@ -39,7 +42,7 @@ public interface WikiApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = WikiResponse.class))
     )
-    ResponseEntity<SuccessResponse<?>> modifyWiki(@AuthenticationPrincipal Long memberId,
+    ResponseEntity<SuccessResponse<?>> modifyWiki(@AuthenticationPrincipal(expression = "member") Member member,
                                                   @Valid @RequestBody CreateOrModifyWikiRequest request);
 
     @Operation(

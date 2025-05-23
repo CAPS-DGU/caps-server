@@ -9,9 +9,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.dgucaps.caps.domain.member.dto.request.CompleteRegistrationRequest;
-import kr.dgucaps.caps.domain.member.dto.request.MemberTokenRequest;
+import kr.dgucaps.caps.domain.member.dto.response.AuthInfoResponse;
 import kr.dgucaps.caps.domain.member.dto.response.MemberInfoResponse;
-import kr.dgucaps.caps.domain.member.dto.response.MemberTokenResponse;
+import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -29,7 +29,7 @@ public interface AuthApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = MemberInfoResponse.class))
     )
-    ResponseEntity<SuccessResponse<?>> completeRegistration(@AuthenticationPrincipal Long memberId,
+    ResponseEntity<SuccessResponse<?>> completeRegistration(@AuthenticationPrincipal(expression = "member") Member member,
                                                                    @RequestBody @Valid CompleteRegistrationRequest request);
 
     @Operation(
@@ -39,7 +39,7 @@ public interface AuthApi {
                     "클라이언트의 액세스, 리프레쉬 토큰을 삭제해야합니다."
     )
     @ApiResponse(responseCode = "204", description = "로그아웃 성공")
-    ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal Long userId);
+    ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal(expression = "member") Member member);
 
     @Operation(
             summary = "토큰 재발급",
@@ -54,4 +54,16 @@ public interface AuthApi {
     })
     ResponseEntity<SuccessResponse<?>> reissueToken(@CookieValue(value = "refreshToken", required = false) String refreshToken,
                                                            HttpServletResponse response);
+
+    @Operation(
+            summary = "인증 정보 조회",
+            description = "현재 로그인한 사용자의 인증 정보 및 온보딩 완료 여부를 조회합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "인증 정보 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = AuthInfoResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증 정보가 없음")
+    })
+    ResponseEntity<SuccessResponse<?>> getAuthInfo(@AuthenticationPrincipal(expression = "member") Member member);
 }

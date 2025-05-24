@@ -22,7 +22,7 @@ public class WikiController implements WikiApi {
     @PostMapping
     public ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal(expression = "member") Member member,
                                                          @Valid @RequestBody CreateOrModifyWikiRequest request) {
-        return SuccessResponse.ok(wikiService.createWiki(member, request));
+        return SuccessResponse.created(wikiService.createWiki(memberId, request));
     }
 
     @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")

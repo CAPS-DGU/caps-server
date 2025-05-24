@@ -26,7 +26,7 @@ public interface WikiApi {
             description = "위키를 작성합니다."
     )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "위키 작성 성공",
+        @ApiResponse(responseCode = "201", description = "위키 작성 성공",
                 content = @Content(mediaType = "application/json",
                         schema = @Schema(implementation = WikiResponse.class))),
         @ApiResponse(responseCode = "409", description = "이미 존재하는 위키 제목")

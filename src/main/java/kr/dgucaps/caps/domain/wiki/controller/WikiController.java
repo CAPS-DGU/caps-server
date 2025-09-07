@@ -1,14 +1,13 @@
 package kr.dgucaps.caps.domain.wiki.controller;
 
 import jakarta.validation.Valid;
-import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.wiki.dto.request.CreateOrModifyWikiRequest;
 import kr.dgucaps.caps.domain.wiki.service.WikiService;
+import kr.dgucaps.caps.global.annotation.Auth;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,16 +19,16 @@ public class WikiController implements WikiApi {
 
     @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @PostMapping
-    public ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal(expression = "member") Member member,
+    public ResponseEntity<SuccessResponse<?>> createWiki(@Auth Long memberId,
                                                          @Valid @RequestBody CreateOrModifyWikiRequest request) {
-        return SuccessResponse.created(wikiService.createWiki(member, request));
+        return SuccessResponse.created(wikiService.createWiki(memberId, request));
     }
 
     @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @PatchMapping
-    public ResponseEntity<SuccessResponse<?>> modifyWiki(@AuthenticationPrincipal(expression = "member") Member member,
+    public ResponseEntity<SuccessResponse<?>> modifyWiki(@Auth Long memberId,
                                                          @Valid @RequestBody CreateOrModifyWikiRequest request) {
-        return SuccessResponse.ok(wikiService.modifyWiki(member, request));
+        return SuccessResponse.ok(wikiService.modifyWiki(memberId, request));
     }
 
     @GetMapping("/{title}")

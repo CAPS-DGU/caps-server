@@ -6,7 +6,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// 배포 후 삭제
+// TODO: 배포 후 삭제
 @Configuration
 public class WikiApplicationRunner {
 

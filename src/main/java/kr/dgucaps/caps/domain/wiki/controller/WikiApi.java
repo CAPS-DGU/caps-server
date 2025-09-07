@@ -8,13 +8,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.wiki.dto.request.CreateOrModifyWikiRequest;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiResponse;
 import kr.dgucaps.caps.domain.wiki.dto.response.WikiTitleResponse;
+import kr.dgucaps.caps.global.annotation.Auth;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -31,7 +30,7 @@ public interface WikiApi {
                         schema = @Schema(implementation = WikiResponse.class))),
         @ApiResponse(responseCode = "409", description = "이미 존재하는 위키 제목")
     })
-    ResponseEntity<SuccessResponse<?>> createWiki(@AuthenticationPrincipal(expression = "member") Member member,
+    ResponseEntity<SuccessResponse<?>> createWiki(@Auth Long memberId,
                                                   @Valid @RequestBody CreateOrModifyWikiRequest request);
 
     @Operation(
@@ -42,7 +41,7 @@ public interface WikiApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = WikiResponse.class))
     )
-    ResponseEntity<SuccessResponse<?>> modifyWiki(@AuthenticationPrincipal(expression = "member") Member member,
+    ResponseEntity<SuccessResponse<?>> modifyWiki(@Auth Long memberId,
                                                   @Valid @RequestBody CreateOrModifyWikiRequest request);
 
     @Operation(

@@ -1,11 +1,9 @@
 package kr.dgucaps.caps.global.config.auth;
 
+import kr.dgucaps.caps.domain.auth.service.CustomOAuth2UserService;
 import kr.dgucaps.caps.domain.member.repository.MemberRepository;
-import kr.dgucaps.caps.domain.member.service.KakaoOAuth2UserService;
 import kr.dgucaps.caps.global.config.CorsConfig;
-import kr.dgucaps.caps.global.config.auth.jwt.JwtAuthenticationEntryPoint;
-import kr.dgucaps.caps.global.config.auth.jwt.JwtAuthenticationFilter;
-import kr.dgucaps.caps.global.config.auth.jwt.JwtProvider;
+import kr.dgucaps.caps.global.config.auth.jwt.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +26,7 @@ public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final KakaoOAuth2UserService kakaoOAuth2UserService;
+    private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
     private final CorsConfig corsConfig;
     private final MemberRepository memberRepository;
@@ -61,7 +59,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
-                                .userService(kakaoOAuth2UserService))
+                                .userService(customOAuth2UserService))
                         .successHandler(customOAuth2SuccessHandler))
                 .sessionManagement(sessionManagementConfigurer ->
                         sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -69,12 +67,13 @@ public class SecurityConfig {
                         exceptionHandlingConfigurer.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                                 .requestMatchers(whiteList).permitAll()
+                                .requestMatchers("/api/v1/auth/complete-registration").hasRole("CONSENT")
+                                .requestMatchers("/api/**").hasRole("ACCESS")
                                 .anyRequest().authenticated()
                 )
                 .addFilter(corsConfig.corsFilter())
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, memberRepository), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class)
                 .build();
     }

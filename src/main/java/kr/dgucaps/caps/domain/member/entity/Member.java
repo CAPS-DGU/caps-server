@@ -49,7 +49,7 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false, length = 40)
     private String email;
 
-    @Column(nullable = false, length = 100, unique = true)
+    @Column(length = 100, unique = true)
     private String phoneNumber;
 
     @Column(length = 127)
@@ -73,12 +73,11 @@ public class Member extends BaseTimeEntity {
     private LocalDateTime lastLoginAt;
 
     @Builder
-    public Member(String kakaoId, String name, String email, String phoneNumber, String profileImageUrl) {
+    public Member(String kakaoId, String name, String email, String profileImageUrl) {
         this.role = Role.NEW_MEMBER;
         this.kakaoId = kakaoId;
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
         this.profileImageUrl = profileImageUrl;
         this.point = 0;
         this.registrationComplete = false;
@@ -91,9 +90,10 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     List<WikiHistory> wikiHistories = new ArrayList<>();
 
-    public void completeRegistration(String studentNumber, float grade) {
+    public void completeRegistration(String studentNumber, float grade, String phoneNumber) {
         this.studentNumber = studentNumber;
         this.grade = grade;
+        this.phoneNumber = phoneNumber;
         this.registrationComplete = true;
     }
 

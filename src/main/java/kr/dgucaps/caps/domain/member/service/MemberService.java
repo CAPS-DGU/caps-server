@@ -24,7 +24,9 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberInfoResponse updateMember(Member member, UpdateMemberRequest request) {
+    public MemberInfoResponse updateMember(Long memberId, UpdateMemberRequest request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         member.updateMember(request.comment(), request.profileImageUrl());
         return MemberInfoResponse.from(member);
     }

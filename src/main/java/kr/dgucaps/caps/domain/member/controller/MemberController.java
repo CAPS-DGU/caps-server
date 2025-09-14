@@ -2,12 +2,11 @@ package kr.dgucaps.caps.domain.member.controller;
 
 import jakarta.validation.Valid;
 import kr.dgucaps.caps.domain.member.dto.request.UpdateMemberRequest;
-import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.member.service.MemberService;
+import kr.dgucaps.caps.global.annotation.Auth;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,8 +17,8 @@ public class MemberController implements MemberApi {
     private final MemberService memberService;
 
     @GetMapping("/me")
-    public ResponseEntity<SuccessResponse<?>> getMemberInfo(@AuthenticationPrincipal(expression = "member") Member member) {
-        return SuccessResponse.ok(memberService.getMemberInfo(member.getId()));
+    public ResponseEntity<SuccessResponse<?>> getMemberInfo(@Auth Long memberId) {
+        return SuccessResponse.ok(memberService.getMemberInfo(memberId));
     }
 
     @GetMapping("/{memberId}")
@@ -28,9 +27,9 @@ public class MemberController implements MemberApi {
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<SuccessResponse<?>> updateMember(@AuthenticationPrincipal(expression = "member") Member member,
+    public ResponseEntity<SuccessResponse<?>> updateMember(@Auth Long memberId,
                                                            @Valid @RequestBody UpdateMemberRequest request) {
-        return SuccessResponse.ok(memberService.updateMember(member, request));
+        return SuccessResponse.ok(memberService.updateMember(memberId, request));
     }
 
 //    @DeleteMapping("/user/{userId}")

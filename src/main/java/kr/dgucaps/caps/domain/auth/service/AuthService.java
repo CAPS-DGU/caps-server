@@ -3,6 +3,8 @@ package kr.dgucaps.caps.domain.auth.service;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.dgucaps.caps.domain.member.dto.request.CompleteRegistrationRequest;
 import kr.dgucaps.caps.domain.member.entity.Member;
+import kr.dgucaps.caps.domain.member.entity.Role;
+import kr.dgucaps.caps.domain.member.repository.MemberListRepository;
 import kr.dgucaps.caps.domain.member.repository.MemberRepository;
 import kr.dgucaps.caps.domain.redis.entity.RefreshToken;
 import kr.dgucaps.caps.domain.redis.repository.RefreshTokenRepository;
@@ -25,6 +27,7 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
+    private final MemberListRepository memberListRepository;
 
     public void reissueToken(String refreshToken, HttpServletResponse response) {
         if (!StringUtils.hasText(refreshToken)) {
@@ -64,6 +67,9 @@ public class AuthService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         member.completeRegistration(request.studentNumber(), request.grade(), request.phoneNumber());
+
+        memberListRepository.findByStudentIdAndPhoneNumber(request.studentNumber(), request.phoneNumber())
+                .ifPresent(memberList -> member.updateRole(Role.MEMBER));
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(String.valueOf(memberId), null, null);
         String accessToken = jwtProvider.generateAccessToken(authentication);

@@ -48,9 +48,9 @@ public class WikiService {
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.WIKI_NOT_FOUND));
         WikiHistory wikiHistory = WikiHistory.builder()
                 .wiki(wiki)
-                .member(wiki.getMember())
-                .title(wiki.getTitle())
-                .content(wiki.getContent())
+                .member(member)
+                .title(request.title())
+                .content(request.content())
                 .build();
         wikiHistoryRepository.save(wikiHistory);
         wiki.updateWiki(member, request.title(), request.content());

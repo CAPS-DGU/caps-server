@@ -68,7 +68,7 @@ public class AuthService {
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         member.completeRegistration(request.studentNumber(), request.grade(), request.phoneNumber());
 
-        memberListRepository.findByStudentIdAndPhoneNumber(request.studentNumber(), request.phoneNumber())
+        memberListRepository.findByStudentIdAndPhoneNumber(request.studentNumber(), request.phoneNumber().replaceAll("-", ""))
                 .ifPresent(memberList -> member.updateRole(Role.MEMBER));
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(String.valueOf(memberId), null, null);

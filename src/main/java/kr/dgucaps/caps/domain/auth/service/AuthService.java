@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -71,9 +73,15 @@ public class AuthService {
         memberListRepository.findByStudentIdAndPhoneNumber(request.studentNumber(), request.phoneNumber().replaceAll("-", ""))
                 .ifPresent(memberList -> member.updateRole(Role.MEMBER));
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(String.valueOf(memberId), null, null);
+        // 업데이트된 권한을 반영한 Authentication 객체 생성
+        Authentication authentication = new UsernamePasswordAuthenticationToken(String.valueOf(memberId), null, Collections.singletonList(member.getRole()));
         String accessToken = jwtProvider.generateAccessToken(authentication);
         String refreshToken = jwtProvider.generateRefreshToken(authentication);
+
+        // Redis에 새로 발급한 refreshToken 저장
+        RefreshToken refreshTokenEntity = new RefreshToken(memberId.toString(), refreshToken);
+        refreshTokenRepository.save(refreshTokenEntity);
+
         jwtProvider.writeTokenCookies(response, accessToken, refreshToken);
     }
 }

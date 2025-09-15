@@ -72,6 +72,7 @@ public class AuthService {
 
         memberListRepository.findByStudentIdAndPhoneNumber(request.studentNumber(), request.phoneNumber().replaceAll("-", ""))
                 .ifPresent(memberList -> member.updateRole(Role.MEMBER));
+        memberRepository.save(member);
 
         // 업데이트된 권한을 반영한 Authentication 객체 생성
         Authentication authentication = new UsernamePasswordAuthenticationToken(String.valueOf(memberId), null, Collections.singletonList(member.getRole()));

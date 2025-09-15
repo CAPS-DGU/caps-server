@@ -37,6 +37,13 @@ public class WikiService {
             throw new ConflictException(ErrorCode.WIKI_ALREADY_EXISTS);
         }
         Wiki savedWiki = wikiRepository.save(request.toEntity(member));
+        WikiHistory wikiHistory = WikiHistory.builder()
+                .wiki(savedWiki)
+                .member(member)
+                .title(request.title())
+                .content(request.content())
+                .build();
+        wikiHistoryRepository.save(wikiHistory);
         return WikiResponse.from(savedWiki);
     }
 

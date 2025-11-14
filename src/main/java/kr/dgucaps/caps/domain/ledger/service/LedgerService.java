@@ -25,9 +25,9 @@ public class LedgerService {
     private final LedgerRepository ledgerRepository;
     private final MemberRepository memberRepository;
 
-    public List<Ledger> getLedgersByPage(int page) {
+    public List<LedgerResponse> getLedgersByPage(int page) {
         Pageable pageable = PageRequest.of(page, 12, Sort.by("createdAt").descending());
-        return ledgerRepository.findAll(pageable).stream().toList();
+        return ledgerRepository.findAll(pageable).map(LedgerResponse::from).toList();
     }
 
     public LedgerResponse getLedgerById(Long ledgerId) {
@@ -63,10 +63,10 @@ public class LedgerService {
     }
 
     @Transactional
-    public int updateViewCount(Long ledgerId) {
+    public void updateViewCount(Long ledgerId) {
         if (!ledgerRepository.existsById(ledgerId)) {
             throw new EntityNotFoundException(ErrorCode.LEDGER_NOT_FOUND);
         }
-        return ledgerRepository.updateView(ledgerId);
+        ledgerRepository.updateView(ledgerId);
     }
 }

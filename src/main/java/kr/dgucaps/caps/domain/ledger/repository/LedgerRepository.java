@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface LedgerRepository extends JpaRepository<Ledger, Long> {
     @Modifying
     @Query("UPDATE Ledger l set l.viewCount = l.viewCount + 1 where l.id = :id")
-    int updateView(Long id);
+    void updateView(Long id);
 }

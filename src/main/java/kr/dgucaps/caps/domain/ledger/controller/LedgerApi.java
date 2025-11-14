@@ -47,7 +47,7 @@ public interface LedgerApi {
             description = "새로운 게시물을 장부 게시판에 등록합니다"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "게시물 작성 성공",
+            @ApiResponse(responseCode = "201", description = "게시물 작성 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = LedgerApi.class))),
             @ApiResponse(responseCode = "401", description = "게시물을 작성할 권한이 없음")
@@ -59,7 +59,7 @@ public interface LedgerApi {
             description = "기존 게시물의 내용을 수정합니다"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "게시물 수정 성공",
+            @ApiResponse(responseCode = "201", description = "게시물 수정 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = LedgerApi.class))),
             @ApiResponse(responseCode = "401", description = "게시물을 수정할 권한이 없음")

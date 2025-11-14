@@ -20,15 +20,15 @@ public class LedgerController implements LedgerApi {
 
     private final LedgerService ledgerService;
 
-    @GetMapping("/")
+    @GetMapping({"/", ""})
     public ResponseEntity<SuccessResponse<?>> getLedgersList(@RequestParam(value = "page", required = false, defaultValue = "1") @Valid @Min(1) Integer page) {
-        return SuccessResponse.created(ledgerService.getLedgersByPage(page-1));
+        return SuccessResponse.ok(ledgerService.getLedgersByPage(page-1));
     }
 
     @GetMapping("/{ledgerId}")
     public ResponseEntity<SuccessResponse<?>> getSpecificLedger(@PathVariable("ledgerId") Long ledgerId) {
         ledgerService.updateViewCount(ledgerId);
-        return SuccessResponse.created(ledgerService.getLedgerById(ledgerId));
+        return SuccessResponse.ok(ledgerService.getLedgerById(ledgerId));
     }
 
     @PreAuthorize("hasAnyRole('COUNCIL', 'PRESIDENT', 'ADMIN')")

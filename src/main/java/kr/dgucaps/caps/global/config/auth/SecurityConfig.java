@@ -43,10 +43,7 @@ public class SecurityConfig {
             "api/v1/wikis/*",
             "api/v1/wikis/recent",
             "api/v1/wikis/random",
-            "api/v1/wikis/*/history",
-            "api/v1/ledgers/",
-            "api/v1/ledgers/*",
-            "api/v1/ledgers",
+            "api/v1/wikis/*/history"
     };
 
     @Bean

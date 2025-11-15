@@ -3,7 +3,6 @@ package kr.dgucaps.caps.domain.ledger.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import kr.dgucaps.caps.domain.ledger.entity.Ledger;
 import kr.dgucaps.caps.domain.member.entity.Member;
-import kr.dgucaps.caps.domain.wiki.entity.Wiki;
 
 public record CreateOrModifyLedgerRequest(
         @NotBlank String title,

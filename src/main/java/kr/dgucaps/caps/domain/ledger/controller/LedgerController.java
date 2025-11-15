@@ -7,10 +7,13 @@ import kr.dgucaps.caps.domain.ledger.service.LedgerService;
 import kr.dgucaps.caps.global.annotation.Auth;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,11 +23,13 @@ public class LedgerController implements LedgerApi {
 
     private final LedgerService ledgerService;
 
-    @GetMapping({"/", ""})
+    @PreAuthorize("hasAnyRole('MEMBER', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
+    @GetMapping
     public ResponseEntity<SuccessResponse<?>> getLedgersList(@RequestParam(value = "page", required = false, defaultValue = "1") @Valid @Min(1) Integer page) {
         return SuccessResponse.ok(ledgerService.getLedgersByPage(page-1));
     }
 
+    @PreAuthorize("hasAnyRole('MEMBER', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @GetMapping("/{ledgerId}")
     public ResponseEntity<SuccessResponse<?>> getSpecificLedger(@PathVariable("ledgerId") Long ledgerId) {
         ledgerService.updateViewCount(ledgerId);
@@ -32,15 +37,22 @@ public class LedgerController implements LedgerApi {
     }
 
     @PreAuthorize("hasAnyRole('COUNCIL', 'PRESIDENT', 'ADMIN')")
-    @PostMapping("/")
-    public ResponseEntity<SuccessResponse<?>> createLedger(@Auth Long memberId, @Valid @RequestBody CreateOrModifyLedgerRequest request) {
+    @PostMapping()
+    public ResponseEntity<SuccessResponse<?>> createLedger(
+            @Auth Long memberId,
+            @Valid @RequestBody CreateOrModifyLedgerRequest request
+    ) {
         return SuccessResponse.created(ledgerService.createLedger(memberId, request));
     }
 
     @PreAuthorize("hasAnyRole('COUNCIL', 'PRESIDENT', 'ADMIN')")
     @PatchMapping("/{ledgerId}")
-    public ResponseEntity<SuccessResponse<?>> modifyLedger(@Auth Long memberId, @PathVariable("ledgerId") Long ledgerId, @Valid @RequestBody CreateOrModifyLedgerRequest request) {
-        return SuccessResponse.created(ledgerService.modifyLedger(memberId, ledgerId, request));
+    public ResponseEntity<SuccessResponse<?>> modifyLedger(
+            @Auth Long memberId,
+            @PathVariable("ledgerId") Long ledgerId,
+            @Valid @RequestBody CreateOrModifyLedgerRequest request
+    ) {
+        return SuccessResponse.ok(ledgerService.modifyLedger(memberId, ledgerId, request));
     }
 
     @PreAuthorize("hasAnyRole('COUNCIL', 'PRESIDENT', 'ADMIN')")

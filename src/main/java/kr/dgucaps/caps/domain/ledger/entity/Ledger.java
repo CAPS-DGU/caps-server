@@ -41,8 +41,7 @@ public class Ledger extends BaseTimeEntity {
         this.fileUrl = fileUrl;
     }
 
-    public void updateLedger(Member member, String title, String content, String fileUrl) {
-        this.member = member;
+    public void updateLedger(String title, String content, String fileUrl) {
         this.title = title;
         this.content = content;
         this.fileUrl = fileUrl;

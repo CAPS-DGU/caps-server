@@ -7,20 +7,16 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record LedgerResponse(
+public record LedgerListResponse(
         Long id,
         String title,
-        String content,
-        String fileUrl,
         MemberSummary member,
         LocalDateTime createdAt
 ) {
-    public static LedgerResponse from(Ledger ledger) {
-        return LedgerResponse.builder()
+    public static LedgerListResponse from(Ledger ledger) {
+        return LedgerListResponse.builder()
                 .id(ledger.getId())
                 .title(ledger.getTitle())
-                .content(ledger.getContent())
-                .fileUrl(ledger.getFileUrl())
                 .member(MemberSummary.from(ledger.getMember()))
                 .createdAt(ledger.getCreatedAt())
                 .build();

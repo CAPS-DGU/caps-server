@@ -12,10 +12,8 @@ import kr.dgucaps.caps.domain.ledger.dto.request.CreateOrModifyLedgerRequest;
 import kr.dgucaps.caps.global.annotation.Auth;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Ledger", description = "장부 API")
@@ -54,19 +52,27 @@ public interface LedgerApi {
                             schema = @Schema(implementation = LedgerApi.class))),
             @ApiResponse(responseCode = "401", description = "게시물을 작성할 권한이 없음")
     })
-    ResponseEntity<SuccessResponse<?>> createLedger(@Auth Long memberId, @Valid @RequestBody CreateOrModifyLedgerRequest request);
+    ResponseEntity<SuccessResponse<?>> createLedger(
+            @Auth Long memberId,
+            @ModelAttribute @Valid CreateOrModifyLedgerRequest request,
+            Errors errors
+    );
 
     @Operation(
             summary = "게시물 수정",
             description = "기존 게시물의 내용을 수정합니다"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "게시물 수정 성공",
+            @ApiResponse(responseCode = "200", description = "게시물 수정 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = LedgerApi.class))),
             @ApiResponse(responseCode = "401", description = "게시물을 수정할 권한이 없음")
     })
-    ResponseEntity<SuccessResponse<?>> modifyLedger(@Auth Long memberId, @PathVariable("ledgerId") Long ledgerId, @Valid @RequestBody CreateOrModifyLedgerRequest request);
+    ResponseEntity<SuccessResponse<?>> modifyLedger(
+            @Auth Long memberId,
+            @PathVariable("ledgerId") Long ledgerId,
+            @ModelAttribute @Valid CreateOrModifyLedgerRequest request
+    );
 
     @Operation(
             summary = "게시물 삭제",

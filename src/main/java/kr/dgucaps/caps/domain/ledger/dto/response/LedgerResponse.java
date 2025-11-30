@@ -13,7 +13,8 @@ public record LedgerResponse(
         String content,
         String fileUrl,
         MemberSummary member,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Boolean isPinned
 ) {
     public static LedgerResponse from(Ledger ledger) {
         return LedgerResponse.builder()
@@ -23,6 +24,7 @@ public record LedgerResponse(
                 .fileUrl(ledger.getFileUrl())
                 .member(MemberSummary.from(ledger.getMember()))
                 .createdAt(ledger.getCreatedAt())
+                .isPinned(ledger.isPinned())
                 .build();
     }
 }

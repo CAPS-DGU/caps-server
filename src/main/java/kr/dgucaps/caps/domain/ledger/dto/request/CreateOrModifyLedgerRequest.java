@@ -7,7 +7,8 @@ import kr.dgucaps.caps.domain.member.entity.Member;
 public record CreateOrModifyLedgerRequest(
         @NotBlank String title,
         @NotBlank String content,
-        String fileUrl
+        String fileUrl,
+        Boolean isPinned
 ) {
     public Ledger toEntity(Member member) {
          return Ledger.builder()
@@ -15,6 +16,7 @@ public record CreateOrModifyLedgerRequest(
                 .title(title)
                 .content(content)
                 .fileUrl(fileUrl)
+                .isPinned(isPinned)
                 .build();
     }
 }

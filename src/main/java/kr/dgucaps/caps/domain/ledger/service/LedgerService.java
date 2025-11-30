@@ -27,7 +27,8 @@ public class LedgerService {
     private final MemberRepository memberRepository;
 
     public Page<LedgerListResponse> getLedgersByPage(int page) {
-        Pageable pageable = PageRequest.of(page, 12, Sort.by("createdAt").descending());
+        Sort sort = Sort.by(Sort.Order.desc("isPinned"), Sort.Order.desc("createdAt"));
+        Pageable pageable = PageRequest.of(page, 12, sort);
         Page<Ledger> ledgerPage = ledgerRepository.findAll(pageable);
         return ledgerPage.map(LedgerListResponse::from);
     }
@@ -57,7 +58,7 @@ public class LedgerService {
             throw new ForbiddenException(ErrorCode.FORBIDDEN);
         }
         
-        ledger.updateLedger(request.title(), request.content(), request.fileUrl());
+        ledger.updateLedger(request.title(), request.content(), request.fileUrl(), request.isPinned());
         Ledger updatedLedger = ledgerRepository.save(ledger);
         return LedgerResponse.from(updatedLedger);
     }

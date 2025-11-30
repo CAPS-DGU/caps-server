@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -34,20 +35,30 @@ public class Ledger extends BaseTimeEntity {
     @Column(nullable = false, name = "view_count")
     private Integer viewCount = 0;
 
+    @Column(nullable = false, name = "is_pinned")
+    @ColumnDefault("false")
+    private boolean isPinned;
+
     @Builder
-    public Ledger(Member member, String title, String content, String fileUrl) {
+    public Ledger(Member member, String title, String content, String fileUrl, Boolean isPinned) {
         this.member = member;
         this.title = title;
         this.content = content;
         this.fileUrl = fileUrl;
         this.viewCount = 0;
+        if (isPinned != null) {
+            this.isPinned = isPinned;
+        }
     }
 
-    public void updateLedger(String title, String content, String fileUrl) {
+    public void updateLedger(String title, String content, String fileUrl, Boolean isPinned) {
         this.title = title;
         this.content = content;
         if (fileUrl != null && !fileUrl.isBlank()) {
             this.fileUrl = fileUrl;
+        }
+        if (isPinned != null) {
+            this.isPinned = isPinned;
         }
     }
 

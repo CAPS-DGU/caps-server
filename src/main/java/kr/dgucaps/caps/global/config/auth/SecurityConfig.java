@@ -1,6 +1,7 @@
 package kr.dgucaps.caps.global.config.auth;
 
 import kr.dgucaps.caps.domain.auth.service.CustomOAuth2UserService;
+import kr.dgucaps.caps.domain.member.repository.MemberRepository;
 import kr.dgucaps.caps.global.config.CorsConfig;
 import kr.dgucaps.caps.global.config.auth.jwt.*;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
     private final CorsConfig corsConfig;
+    private final MemberRepository memberRepository;
 
     // 토큰 없이 접근 가능한 URL
     private static final String[] whiteList = {"/",
@@ -41,7 +43,7 @@ public class SecurityConfig {
             "api/v1/wikis/*",
             "api/v1/wikis/recent",
             "api/v1/wikis/random",
-            "api/v1/wikis/*/history"
+            "api/v1/wikis/*/history",
     };
 
     @Bean

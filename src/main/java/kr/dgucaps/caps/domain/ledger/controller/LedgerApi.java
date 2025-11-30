@@ -12,9 +12,7 @@ import kr.dgucaps.caps.domain.ledger.dto.request.CreateOrModifyLedgerRequest;
 import kr.dgucaps.caps.global.annotation.Auth;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Ledger", description = "장부 API")
 public interface LedgerApi {
@@ -54,8 +52,7 @@ public interface LedgerApi {
     })
     ResponseEntity<SuccessResponse<?>> createLedger(
             @Auth Long memberId,
-            @ModelAttribute @Valid CreateOrModifyLedgerRequest request,
-            Errors errors
+            @RequestBody @Valid CreateOrModifyLedgerRequest request
     );
 
     @Operation(
@@ -71,7 +68,7 @@ public interface LedgerApi {
     ResponseEntity<SuccessResponse<?>> modifyLedger(
             @Auth Long memberId,
             @PathVariable("ledgerId") Long ledgerId,
-            @ModelAttribute @Valid CreateOrModifyLedgerRequest request
+            @RequestBody @Valid CreateOrModifyLedgerRequest request
     );
 
     @Operation(
@@ -83,5 +80,9 @@ public interface LedgerApi {
             @ApiResponse(responseCode = "401", description = "게시물을 삭제할 권한이 없음"),
             @ApiResponse(responseCode = "404", description = "해당 게시물이 존재하지 않음")
     })
-    ResponseEntity<SuccessResponse<?>> deleteLedger(@PathVariable("ledgerId") Long ledgerId);
+    ResponseEntity<SuccessResponse<?>> deleteLedger(
+            @Auth Long memberId,
+            @PathVariable("ledgerId") Long ledgerId
+    );
+
 }

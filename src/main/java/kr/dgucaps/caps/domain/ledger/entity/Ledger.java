@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "ledger")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Ledger extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +25,7 @@ public class Ledger extends BaseTimeEntity {
     @Column(nullable = false)
     private String title;
 
-    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     @Column(nullable = true, name = "file_url")
@@ -34,16 +35,24 @@ public class Ledger extends BaseTimeEntity {
     private Integer viewCount = 0;
 
     @Builder
-    public Ledger(Member member, String title, String content, String fileUrl, Integer viewCount) {
+    public Ledger(Member member, String title, String content, String fileUrl) {
         this.member = member;
         this.title = title;
         this.content = content;
         this.fileUrl = fileUrl;
+        this.viewCount = 0;
     }
 
     public void updateLedger(String title, String content, String fileUrl) {
         this.title = title;
         this.content = content;
-        this.fileUrl = fileUrl;
+        if (fileUrl != null && !fileUrl.isBlank()) {
+            this.fileUrl = fileUrl;
+        }
     }
+
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+
 }

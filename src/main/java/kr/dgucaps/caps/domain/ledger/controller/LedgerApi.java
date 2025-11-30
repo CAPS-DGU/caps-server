@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import kr.dgucaps.caps.domain.ledger.dto.request.CreateOrModifyLedgerRequest;
+import kr.dgucaps.caps.domain.ledger.dto.response.LedgerListResponse;
+import kr.dgucaps.caps.domain.ledger.dto.response.LedgerResponse;
 import kr.dgucaps.caps.global.annotation.Auth;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +26,7 @@ public interface LedgerApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "게시물 목록 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LedgerApi.class)))
+                            schema = @Schema(implementation = LedgerListResponse.class)))
     })
     ResponseEntity<SuccessResponse<?>> getLedgersList(@RequestParam(value = "page", required = false, defaultValue = "1") @Valid @Min(1) Integer page);
 
@@ -35,7 +37,7 @@ public interface LedgerApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "게시물 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LedgerApi.class))),
+                            schema = @Schema(implementation = LedgerResponse.class))),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 장부 아이디")
     })
     ResponseEntity<SuccessResponse<?>> getSpecificLedger(@PathVariable("ledgerId") Long ledgerId);
@@ -47,7 +49,7 @@ public interface LedgerApi {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "게시물 작성 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LedgerApi.class))),
+                            schema = @Schema(implementation = LedgerResponse.class))),
             @ApiResponse(responseCode = "401", description = "게시물을 작성할 권한이 없음")
     })
     ResponseEntity<SuccessResponse<?>> createLedger(
@@ -62,7 +64,7 @@ public interface LedgerApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "게시물 수정 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = LedgerApi.class))),
+                            schema = @Schema(implementation = LedgerResponse.class))),
             @ApiResponse(responseCode = "401", description = "게시물을 수정할 권한이 없음")
     })
     ResponseEntity<SuccessResponse<?>> modifyLedger(

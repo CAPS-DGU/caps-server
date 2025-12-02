@@ -20,20 +20,17 @@ public class LedgerController implements LedgerApi {
 
     private final LedgerService ledgerService;
 
-    @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @GetMapping
     public ResponseEntity<SuccessResponse<?>> getLedgersList(
             @RequestParam(value = "page", required = false, defaultValue = "1") @Valid @Min(1) Integer page) {
         return SuccessResponse.ok(ledgerService.getLedgersByPage(page-1));
     }
 
-    @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @GetMapping("/{ledgerId}") 
     public ResponseEntity<SuccessResponse<?>> getSpecificLedger(@PathVariable("ledgerId") Long ledgerId) {
         return SuccessResponse.ok(ledgerService.getLedgerById(ledgerId));
     }
 
-    @PreAuthorize("hasAnyRole('COUNCIL', 'PRESIDENT', 'ADMIN')")
     @PostMapping
     public ResponseEntity<SuccessResponse<?>> createLedger(
             @Auth Long memberId,
@@ -42,7 +39,6 @@ public class LedgerController implements LedgerApi {
         return SuccessResponse.created(ledgerService.createLedger(memberId, request));
     }
 
-    @PreAuthorize("hasAnyRole('COUNCIL', 'PRESIDENT', 'ADMIN')")
     @PatchMapping("/{ledgerId}")
     public ResponseEntity<SuccessResponse<?>> modifyLedger(
             @Auth Long memberId,
@@ -52,7 +48,6 @@ public class LedgerController implements LedgerApi {
         return SuccessResponse.ok(ledgerService.modifyLedger(ledgerId, memberId, request));
     }
 
-    @PreAuthorize("hasAnyRole('COUNCIL', 'PRESIDENT', 'ADMIN')")
     @DeleteMapping("/{ledgerId}")
     public ResponseEntity<SuccessResponse<?>> deleteLedger(
             @Auth Long memberId,

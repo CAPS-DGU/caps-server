@@ -10,7 +10,7 @@ public record MemberInfoResponse(
         Role role,
         String name,
         String studentNumber,
-        float grade,
+        Float grade,
         String email,
         String phoneNumber,
         String comment,

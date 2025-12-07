@@ -58,7 +58,7 @@ public class LedgerService {
             throw new ForbiddenException(ErrorCode.FORBIDDEN);
         }
 
-        ledger.updateLedger(request.title(), request.content(), request.fileUrl(), request.isPinned());
+        ledger.updateLedger(request.title(), request.content(), request.fileUrls(), request.isPinned());
         Ledger updatedLedger = ledgerRepository.save(ledger);
         return LedgerResponse.from(updatedLedger);
     }

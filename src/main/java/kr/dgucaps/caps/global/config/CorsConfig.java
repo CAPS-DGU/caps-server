@@ -30,11 +30,14 @@ public class CorsConfig implements WebMvcConfigurer {
         // CORS 허용 URL
         List<String> allowedOrigins = Arrays.asList(
                 frontendLocal,
-                backendTest
+                backendTest,
+                "https://api.dgucaps.kr",
+                "http://localhost:3000",
+                "http://localhost:8080"
         );
         config.setAllowedOrigins(allowedOrigins);
         config.addAllowedHeader("*");
-        config.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
+        config.setAllowedMethods(Arrays.asList("OPTIONS", "HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

@@ -11,7 +11,9 @@ public record LedgerListResponse(
         Long id,
         String title,
         MemberSummary member,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Boolean isPinned,
+        Boolean hasFile
 ) {
     public static LedgerListResponse from(Ledger ledger) {
         return LedgerListResponse.builder()
@@ -19,6 +21,8 @@ public record LedgerListResponse(
                 .title(ledger.getTitle())
                 .member(MemberSummary.from(ledger.getMember()))
                 .createdAt(ledger.getCreatedAt())
+                .isPinned(ledger.isPinned())
+                .hasFile(ledger.getFileUrl() != null && !ledger.getFileUrl().isBlank())
                 .build();
     }
 }

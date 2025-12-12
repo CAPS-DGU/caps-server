@@ -8,6 +8,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,8 +34,9 @@ public class Ledger extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = true, name = "file_url")
-    private String fileUrl;
+    @Column(nullable = true, name = "file_urls", columnDefinition = "JSON")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private List<String> fileUrls;
 
     @Column(nullable = false, name = "view_count")
     private Integer viewCount = 0;
@@ -40,23 +46,24 @@ public class Ledger extends BaseTimeEntity {
     private boolean isPinned;
 
     @Builder
-    public Ledger(Member member, String title, String content, String fileUrl, Boolean isPinned) {
+    public Ledger(Member member, String title, String content, List<String> fileUrls, Boolean isPinned) {
         this.member = member;
         this.title = title;
         this.content = content;
-        this.fileUrl = fileUrl;
+        this.fileUrls = fileUrls != null ? fileUrls : new ArrayList<>();
         this.viewCount = 0;
         if (isPinned != null) {
             this.isPinned = isPinned;
         }
     }
 
-    public void updateLedger(String title, String content, String fileUrl, Boolean isPinned) {
+    public void updateLedger(String title, String content, List<String> fileUrls, Boolean isPinned) {
         this.title = title;
         this.content = content;
-        if (fileUrl != null && !fileUrl.isBlank()) {
-            this.fileUrl = fileUrl;
+        if (fileUrls != null) {
+            this.fileUrls = fileUrls;
         }
+        // fileUrls가 null이면 기존 값 유지 (변경하지 않음)
         if (isPinned != null) {
             this.isPinned = isPinned;
         }

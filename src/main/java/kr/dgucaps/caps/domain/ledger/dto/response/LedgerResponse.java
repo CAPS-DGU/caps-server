@@ -5,13 +5,14 @@ import kr.dgucaps.caps.domain.ledger.entity.Ledger;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 public record LedgerResponse(
         Long id,
         String title,
         String content,
-        String fileUrl,
+        List<String> fileUrls,
         MemberSummary member,
         LocalDateTime createdAt,
         Boolean isPinned
@@ -21,7 +22,7 @@ public record LedgerResponse(
                 .id(ledger.getId())
                 .title(ledger.getTitle())
                 .content(ledger.getContent())
-                .fileUrl(ledger.getFileUrl())
+                .fileUrls(ledger.getFileUrls() != null ? ledger.getFileUrls() : List.of())
                 .member(MemberSummary.from(ledger.getMember()))
                 .createdAt(ledger.getCreatedAt())
                 .isPinned(ledger.isPinned())

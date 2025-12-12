@@ -22,7 +22,7 @@ public record LedgerListResponse(
                 .member(MemberSummary.from(ledger.getMember()))
                 .createdAt(ledger.getCreatedAt())
                 .isPinned(ledger.isPinned())
-                .hasFile(ledger.getFileUrl() != null && !ledger.getFileUrl().isBlank())
+                .hasFile(ledger.getFileUrls() != null && !ledger.getFileUrls().isEmpty())
                 .build();
     }
 }

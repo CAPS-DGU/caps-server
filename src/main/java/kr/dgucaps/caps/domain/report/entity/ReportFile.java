@@ -19,7 +19,7 @@ public class ReportFile {
     @JoinColumn(name = "report_id", nullable = false)
     private Report report;
 
-    @Column(name = "file_url", nullable = false, length = 127)
+    @Column(name = "file_url", nullable = false, length = 256)
     private String fileUrl;
 
     public ReportFile(Report report, String fileUrl) {

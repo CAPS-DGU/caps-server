@@ -49,7 +49,7 @@ public class ReportDiscordWebhookListener {
             **✅ 해결 시 체크 표시를 남겨주세요!**
                 """.formatted(
                 report.getId(),
-                report.getCategory().toJson(),
+                report.getCategory().getTitle(),
                 member.getGrade(),
                 member.getName(),
                 report.getContent(),

@@ -14,8 +14,4 @@ public enum Category {
     USER_REPORT_AND_SECURITY_REPORT("유저 신고 및 보안 제보"),
     ETC("기타");
     private final String title;
-
-    public String toJson() {
-        return title;
-    }
 }

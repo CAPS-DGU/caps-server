@@ -90,6 +90,9 @@ jobs:
             sudo docker run -d --log-driver=syslog --name caps-dev --network caps-network -p 8080:8080 \
               -v /home/ubuntu/app/config:/config \
               -e SPRING_PROFILES_ACTIVE=prod \
+              -e AWS_S3_REGION=ap-northeast-2 \
+              -e AWS_S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+              -e DISCORD_WEBHOOK_URI=${{ secrets.DISCORD_WEBHOOK_URI }} \
               --restart always \
               ${{ secrets.DOCKER_USERNAME }}/caps-dev:${{ github.sha }}
             

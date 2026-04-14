@@ -89,10 +89,6 @@ jobs:
             echo "🚀 새 컨테이너 실행 중..."
             sudo docker run -d --log-driver=syslog --name caps-dev --network caps-network -p 8080:8080 \
               -v /home/ubuntu/app/src/main/resources:/app/src/main/resources \
-              -e SPRING_JPA_HIBERNATE_DDL_AUTO=update \
-              -e SPRING_PROFILES_ACTIVE=dev \
-              -e SPRING_DATA_REDIS_HOST=redis \
-              -e TZ=Asia/Seoul \
               --restart always \
               ${{ secrets.DOCKER_USERNAME }}/caps-dev:${{ github.sha }}
             

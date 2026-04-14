@@ -3,12 +3,14 @@ package kr.dgucaps.caps.domain.member.entity;
 import jakarta.persistence.*;
 import kr.dgucaps.caps.domain.common.entity.BaseTimeEntity;
 import kr.dgucaps.caps.domain.wiki.entity.Wiki;
+import kr.dgucaps.caps.domain.wiki.entity.WikiHistory;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String kakaoId;
 
-    @Column(length = 12, unique = true)
+    @Column(length = 20, unique = true)
     private String username;
 
     @Column
@@ -47,7 +49,7 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false, length = 40)
     private String email;
 
-    @Column(nullable = false, length = 100, unique = true)
+    @Column(length = 100, unique = true)
     private String phoneNumber;
 
     @Column(length = 127)
@@ -57,6 +59,9 @@ public class Member extends BaseTimeEntity {
     private String profileImageUrl;
 
     @Column(nullable = false)
+    private Integer point;
+
+    @Column(nullable = false)
     @ColumnDefault("false")
     private boolean registrationComplete;
 
@@ -64,29 +69,44 @@ public class Member extends BaseTimeEntity {
     @ColumnDefault("false")
     private boolean isDeleted;
 
+    @Column
+    private LocalDateTime lastLoginAt;
+
     @Builder
-    public Member(String kakaoId, String name, String email, String phoneNumber, String profileImageUrl) {
+    public Member(String kakaoId, String name, String email, String profileImageUrl) {
         this.role = Role.NEW_MEMBER;
         this.kakaoId = kakaoId;
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
         this.profileImageUrl = profileImageUrl;
+        this.point = 0;
         this.registrationComplete = false;
         this.isDeleted = false;
     }
 
-    @OneToMany(mappedBy = "editor")
+    @OneToMany(mappedBy = "member")
     List<Wiki> wikis = new ArrayList<>();
 
-    public void completeRegistration(String studentNumber, float grade) {
+    @OneToMany(mappedBy = "member")
+    List<WikiHistory> wikiHistories = new ArrayList<>();
+
+    public void completeRegistration(String studentNumber, float grade, String phoneNumber) {
         this.studentNumber = studentNumber;
         this.grade = grade;
+        this.phoneNumber = phoneNumber;
         this.registrationComplete = true;
     }
 
     public void updateMember(String comment, String profileImageUrl) {
         if (comment != null) this.comment = comment;
         if (profileImageUrl != null) this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateLastLogin() {
+        this.lastLoginAt = LocalDateTime.now();
+    }
+
+    public void updateRole(Role role) {
+        this.role = role;
     }
 }

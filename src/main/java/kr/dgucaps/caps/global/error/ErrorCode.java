@@ -29,6 +29,7 @@ public enum ErrorCode {
     INVALID_IMAGE_FORMAT(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "C017", "지원하지 않는 이미지 형식입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C018", "서버 내부 오류입니다."),
     FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "C019", "파일 업로드에 실패하였습니다."),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "C020", "리프레시 토큰이 존재하지 않습니다."),
 
     // Auth
     JSON_PARSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "A001", "JSON 파싱에 실패하였습니다."),
@@ -37,7 +38,14 @@ public enum ErrorCode {
 
     // Member
     USERNAME_ALREADY_EXISTS(HttpStatus.CONFLICT, "M001", "이미 존재하는 사용자 이름입니다."),
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M002", "사용자가 존재하지 않습니다.")
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "M002", "사용자가 존재하지 않습니다."),
+
+    // Wiki
+    WIKI_NOT_FOUND(HttpStatus.NOT_FOUND, "W001", "위키가 존재하지 않습니다."),
+    WIKI_ALREADY_EXISTS(HttpStatus.CONFLICT, "W002", "이미 존재하는 위키입니다."),
+
+    // Ledger
+    LEDGER_NOT_FOUND(HttpStatus.NOT_FOUND, "L001", "장부가 존재하지 않습니다.")
     ;
 
     private final HttpStatus httpStatus;

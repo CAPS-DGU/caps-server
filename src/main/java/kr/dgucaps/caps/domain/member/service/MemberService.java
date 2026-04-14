@@ -30,4 +30,10 @@ public class MemberService {
         member.updateMember(request.comment(), request.profileImageUrl());
         return MemberInfoResponse.from(member);
     }
+
+    @Transactional
+    public void updateLastLogin(Member member) {
+        member.updateLastLogin();
+        memberRepository.save(member);
+    }
 }

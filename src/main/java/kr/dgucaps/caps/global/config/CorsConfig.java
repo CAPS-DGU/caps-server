@@ -1,5 +1,6 @@
 package kr.dgucaps.caps.global.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -13,6 +14,13 @@ import java.util.List;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
+    // CORS 허용할 URL
+    @Value("${deployment.frontend.local}")
+    private String frontendLocal;
+    @Value("${deployment.backend.test}")
+    private String backendTest;
+
+
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -21,12 +29,15 @@ public class CorsConfig implements WebMvcConfigurer {
 
         // CORS 허용 URL
         List<String> allowedOrigins = Arrays.asList(
-                "http://localhost:8080/",
-                "https://dgucaps.kr/"
+                frontendLocal,
+                backendTest,
+                "https://api.dgucaps.kr",
+                "http://localhost:3000",
+                "http://localhost:8080"
         );
         config.setAllowedOrigins(allowedOrigins);
         config.addAllowedHeader("*");
-        config.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
+        config.setAllowedMethods(Arrays.asList("OPTIONS", "HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0.44
+    container_name: caps-mysql
+    restart: always
+    networks:
+      - caps-network
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: caps_dev
+      TZ: Asia/Seoul
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 36
+      start_period: 90s
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+    networks:
+      - caps-network
+
+  caps-dev:
+    image: ${DOCKER_IMAGE}
+    container_name: caps-dev
+    restart: always
+    networks:
+      - caps-network
+    ports:
+      - "8080:8080"
+    volumes:
+      - /home/ubuntu/app/config:/config
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      AWS_S3_REGION: ap-northeast-2
+      AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
+      DISCORD_WEBHOOK_URI: ${DISCORD_WEBHOOK_URI}
+      TZ: Asia/Seoul
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    logging:
+      driver: syslog
+
+volumes:
+  mysql_data:
+
+networks:
+  caps-network:
+    external: true

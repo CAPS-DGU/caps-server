@@ -101,7 +101,7 @@ jobs:
             sudo chown ubuntu:ubuntu /home/ubuntu/app/deploy/.env
             sudo chmod 600 /home/ubuntu/app/deploy/.env
             
-            echo "🛑 기존 단독 컨테이너 정리 (compose 전환)"
+            echo "🛑 기존 단독 컨테이너 정리"
             sudo docker stop caps-dev redis 2>/dev/null || true
             sudo docker rm -f caps-dev redis 2>/dev/null || true
             
@@ -112,6 +112,25 @@ jobs:
             
             echo "✅ 스택 상태"
             sudo docker compose --env-file .env -f docker-compose.yml ps
+
+            echo "🩺 health check (http://localhost:8080/api/v1/wikis/recent)"
+            HEALTH_OK=0
+            for i in $(seq 1 12); do
+              STATUS="$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/v1/wikis/recent || true)"
+              if [ "$STATUS" = "200" ]; then
+                HEALTH_OK=1
+                echo "Health check passed with HTTP $STATUS (try $i/12)"
+                break
+              fi
+              echo "Health check waiting... HTTP $STATUS ($i/12)"
+              sleep 5
+            done
+
+            if [ "$HEALTH_OK" -ne 1 ]; then
+              echo "❌ Health check failed. Recent caps-dev logs:"
+              sudo docker logs --tail 100 caps-dev || true
+              exit 1
+            fi
             
             echo "🧹 사용하지 않는 Docker 이미지 정리"
             sudo docker system prune -af

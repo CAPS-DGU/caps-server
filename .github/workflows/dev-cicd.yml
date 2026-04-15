@@ -106,6 +106,13 @@ jobs:
             sudo docker rm -f caps-dev redis 2>/dev/null || true
             
             cd /home/ubuntu/app/deploy
+            echo "🧹 pull 전 Docker 디스크 정리"
+            sudo docker system df || true
+            sudo docker image prune -af || true
+            sudo docker container prune -f || true
+            sudo docker builder prune -af || true
+            sudo docker system df || true
+
             echo "🚀 compose pull / up"
             sudo docker compose --env-file .env -f docker-compose.yml pull caps-dev
             sudo docker compose --env-file .env -f docker-compose.yml up -d --remove-orphans

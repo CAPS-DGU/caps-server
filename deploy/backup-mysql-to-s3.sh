@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+DEPLOY_ENV="${DEPLOY_ENV_FILE:-/home/ubuntu/app/deploy/.env}"
+if [[ -f "$DEPLOY_ENV" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$DEPLOY_ENV"
+  set +a
+fi
+
 set -euo pipefail
 
 BUCKET="${AWS_S3_BUCKET_NAME}"

@@ -62,7 +62,7 @@ jobs:
           host: ${{ secrets.DEV_EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.DEV_EC2_PRIVATE_KEY }}
-          source: "deploy/docker-compose.yml,deploy/backup-mysql-to-s3.sh,deploy/install-weekly-backup-cron.sh"
+          source: "deploy/docker-compose.yml,deploy/backup-mysql-to-s3.sh,deploy/install-daily-backup-cron.sh"
           target: "/home/ubuntu/app/deploy/"
           strip_components: 1
 
@@ -139,5 +139,5 @@ jobs:
               exit 1
             fi
             
-            echo "🧹 사용하지 않는 Docker 이미지 정리"
+            echo "사용하지 않는 Docker 이미지 정리"
             sudo docker system prune -af

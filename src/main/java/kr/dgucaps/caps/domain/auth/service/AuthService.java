@@ -1,6 +1,8 @@
 package kr.dgucaps.caps.domain.auth.service;
 
 import jakarta.servlet.http.HttpServletResponse;
+import kr.dgucaps.caps.domain.auth.dto.AuthDto;
+import kr.dgucaps.caps.domain.auth.dto.CustomOAuth2User;
 import kr.dgucaps.caps.domain.member.dto.request.CompleteRegistrationRequest;
 import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.member.entity.Role;
@@ -46,9 +48,15 @@ public class AuthService {
             throw new UnauthorizedException(ErrorCode.NOT_MATCH_REFRESH_TOKEN);
         }
 
-        // 새로 accessToken과 refreshToken 발급
-        String newAccessToken = jwtProvider.generateAccessToken(authentication);
-        String newRefreshToken = jwtProvider.generateRefreshToken(authentication);
+        Member member = memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        AuthDto authDto = AuthDto.of(member.getId(), member.getKakaoId(), member.getName(), member.getRole());
+        Authentication refreshedAuthentication = new UsernamePasswordAuthenticationToken(
+                new CustomOAuth2User(authDto), null, null);
+
+        // 새로 accessToken과 refreshToken 발급 (DB 최신 role 반영)
+        String newAccessToken = jwtProvider.generateAccessToken(refreshedAuthentication);
+        String newRefreshToken = jwtProvider.generateRefreshToken(refreshedAuthentication);
 
         // Redis에 새로 발급한 refreshToken 저장
         RefreshToken newRefreshTokenEntity = new RefreshToken(memberId, newRefreshToken);

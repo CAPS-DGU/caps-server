@@ -1,6 +1,8 @@
 package kr.dgucaps.caps.domain.auth.service;
 
 import jakarta.servlet.http.HttpServletResponse;
+import kr.dgucaps.caps.domain.auth.dto.AuthDto;
+import kr.dgucaps.caps.domain.auth.dto.CustomOAuth2User;
 import kr.dgucaps.caps.domain.member.dto.request.CompleteRegistrationRequest;
 import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.member.entity.Role;
@@ -18,8 +20,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -46,9 +46,15 @@ public class AuthService {
             throw new UnauthorizedException(ErrorCode.NOT_MATCH_REFRESH_TOKEN);
         }
 
-        // 새로 accessToken과 refreshToken 발급
-        String newAccessToken = jwtProvider.generateAccessToken(authentication);
-        String newRefreshToken = jwtProvider.generateRefreshToken(authentication);
+        Member member = memberRepository.findById(Long.parseLong(memberId))
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        AuthDto authDto = AuthDto.of(member.getId(), member.getKakaoId(), member.getName(), member.getRole());
+        Authentication refreshedAuthentication = new UsernamePasswordAuthenticationToken(
+                new CustomOAuth2User(authDto), null, null);
+
+        // 새 accessToken과 refreshToken 발급 (DB 최신 role 반영)
+        String newAccessToken = jwtProvider.generateAccessToken(refreshedAuthentication);
+        String newRefreshToken = jwtProvider.generateRefreshToken(refreshedAuthentication);
 
         // Redis에 새로 발급한 refreshToken 저장
         RefreshToken newRefreshTokenEntity = new RefreshToken(memberId, newRefreshToken);
@@ -72,17 +78,15 @@ public class AuthService {
 
         memberListRepository.findByStudentIdAndPhoneNumber(request.studentNumber(), request.phoneNumber().replaceAll("-", ""))
                 .ifPresent(memberList -> member.updateRole(Role.MEMBER));
-        Member savedMember = memberRepository.save(member);
 
-        // 업데이트된 권한을 반영한 Authentication 객체 생성
-        Authentication authentication = new UsernamePasswordAuthenticationToken(String.valueOf(memberId), null, Collections.singletonList(savedMember.getRole()));
+        AuthDto authDto = AuthDto.of(
+                member.getId(), member.getKakaoId(), member.getName(), member.getRole());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                new CustomOAuth2User(authDto), null, null);
         String accessToken = jwtProvider.generateAccessToken(authentication);
         String refreshToken = jwtProvider.generateRefreshToken(authentication);
-
-        // Redis에 새로 발급한 refreshToken 저장
-        RefreshToken refreshTokenEntity = new RefreshToken(memberId.toString(), refreshToken);
+        RefreshToken refreshTokenEntity = new RefreshToken(String.valueOf(member.getId()), refreshToken);
         refreshTokenRepository.save(refreshTokenEntity);
-
         jwtProvider.writeTokenCookies(response, accessToken, refreshToken);
     }
 }

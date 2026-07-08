@@ -38,10 +38,6 @@ public class SecurityConfig {
 
             /* api */
             "api/v1/auth/reissue",
-            "api/v1/wikis/*",
-            "api/v1/wikis/recent",
-            "api/v1/wikis/random",
-            "api/v1/wikis/*/history",
     };
 
     @Bean

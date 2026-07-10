@@ -28,16 +28,18 @@ public interface MemberApi {
     ResponseEntity<SuccessResponse<?>> getMemberInfo(Long memberId);
 
     @Operation(
-            summary = "다른 회원 정보 조회",
-            description = "본인이 아닌 회원을 번호로 조회합니다."
+            summary = "회원 정보 번호 조회",
+            description = "회원 번호로 조회합니다. 개인정보 보호를 위해 본인 번호만 조회할 수 있습니다."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "다른 회원 정보 조회 성공",
+            @ApiResponse(responseCode = "200", description = "회원 정보 조회 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = MemberInfoResponse.class))),
+            @ApiResponse(responseCode = "403", description = "본인이 아닌 회원 조회 시도"),
             @ApiResponse(responseCode = "404", description = "회원이 존재하지 않음")
     })
-    ResponseEntity<SuccessResponse<?>> getOtherMemberInfo(@PathVariable("memberId") Long memberId);
+    ResponseEntity<SuccessResponse<?>> getOtherMemberInfo(Long authMemberId,
+                                                          @PathVariable("memberId") Long memberId);
 
     @Operation(
             summary = "내 정보 수정",

@@ -5,6 +5,7 @@ import kr.dgucaps.caps.domain.member.dto.request.UpdateMemberRequest;
 import kr.dgucaps.caps.domain.member.service.MemberService;
 import kr.dgucaps.caps.global.annotation.Auth;
 import kr.dgucaps.caps.global.common.SuccessResponse;
+import kr.dgucaps.caps.global.error.exception.ForbiddenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,12 @@ public class MemberController implements MemberApi {
     }
 
     @GetMapping("/{memberId}")
-    public ResponseEntity<SuccessResponse<?>> getOtherMemberInfo(@PathVariable("memberId") Long memberId) {
+    public ResponseEntity<SuccessResponse<?>> getOtherMemberInfo(@Auth Long authMemberId,
+                                                                 @PathVariable("memberId") Long memberId) {
+        // 본인 정보만 조회 가능 (타인의 학번·전화번호·이메일 등 개인정보 노출 방지)
+        if (!authMemberId.equals(memberId)) {
+            throw new ForbiddenException();
+        }
         return SuccessResponse.ok(memberService.getMemberInfo(memberId));
     }
 

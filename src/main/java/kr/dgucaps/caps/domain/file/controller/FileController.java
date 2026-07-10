@@ -42,8 +42,8 @@ public class FileController {
         return SuccessResponse.ok(Map.of("downloadURL", presignedUrl));
     }
 
-    // 파일 삭제
-    @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
+    // 파일 삭제 (임의 삭제 방지를 위해 관리자만 허용)
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping
     public ResponseEntity<SuccessResponse<?>> deleteFile(
             @RequestParam("key") @NotBlank String fileKey) {

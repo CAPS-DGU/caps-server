@@ -3,15 +3,19 @@ package kr.dgucaps.caps.domain.blog.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import kr.dgucaps.caps.domain.blog.dto.request.CreateOrModifyBlogRequest;
 import kr.dgucaps.caps.domain.blog.entity.BlogCategory;
 import kr.dgucaps.caps.domain.blog.service.BlogService;
 import kr.dgucaps.caps.global.annotation.Auth;
 import kr.dgucaps.caps.global.common.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,5 +45,15 @@ public class BlogController implements BlogApi {
             @Auth Long memberId
     ) {
         return SuccessResponse.ok(blogService.getBlogById(blogId, memberId));
+    }
+
+    // 게시물 작성
+    @PreAuthorize("hasAnyRole('PRESIDENT', 'ADMIN')")
+    @PostMapping
+    public ResponseEntity<SuccessResponse<?>> createBlog(
+            @Auth Long memberId,
+            @RequestBody @Valid CreateOrModifyBlogRequest request
+    ) {
+        return SuccessResponse.created(blogService.createBlog(memberId, request));
     }
 }

@@ -1,12 +1,15 @@
 package kr.dgucaps.caps.domain.blog.service;
 
 import kr.dgucaps.caps.domain.auth.dto.CustomOAuth2User;
+import kr.dgucaps.caps.domain.blog.dto.request.CreateOrModifyBlogRequest;
 import kr.dgucaps.caps.domain.blog.dto.response.BlogListResponse;
 import kr.dgucaps.caps.domain.blog.dto.response.BlogResponse;
 import kr.dgucaps.caps.domain.blog.entity.BlogCategory;
 import kr.dgucaps.caps.domain.blog.entity.BlogPost;
 import kr.dgucaps.caps.domain.blog.repository.BlogPostRepository;
+import kr.dgucaps.caps.domain.member.entity.Member;
 import kr.dgucaps.caps.domain.member.entity.Role;
+import kr.dgucaps.caps.domain.member.repository.MemberRepository;
 import kr.dgucaps.caps.global.error.ErrorCode;
 import kr.dgucaps.caps.global.error.exception.EntityNotFoundException;
 import kr.dgucaps.caps.global.error.exception.ForbiddenException;
@@ -20,6 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -28,6 +33,7 @@ public class BlogService {
     private static final int PAGE_SIZE = 12;
 
     private final BlogPostRepository blogPostRepository;
+    private final MemberRepository memberRepository;
 
     // 카테고리·권한별 게시물 목록 조회
     public Page<BlogListResponse> getBlogsByPage(BlogCategory category, int page, Long memberId) {
@@ -44,6 +50,30 @@ public class BlogService {
         validatePrivateAccess(blogPost, memberId);
         blogPost.increaseViewCount();
         return BlogResponse.from(blogPost);
+    }
+
+    // 게시물 작성
+    @Transactional
+    public BlogResponse createBlog(Long memberId, CreateOrModifyBlogRequest request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        BlogPost blogPost = request.toEntity(member);
+        attachFilesAndImages(blogPost, request.fileUrls(), request.imageUrls());
+        return BlogResponse.from(blogPostRepository.save(blogPost));
+    }
+
+    // 첨부파일·본문 이미지 연결
+    private void attachFilesAndImages(BlogPost blogPost, List<String> fileUrls, List<String> imageUrls) {
+        if (fileUrls != null) {
+            for (int i = 0; i < fileUrls.size(); i++) {
+                blogPost.addFile(fileUrls.get(i), i);
+            }
+        }
+        if (imageUrls != null) {
+            for (int i = 0; i < imageUrls.size(); i++) {
+                blogPost.addImage(imageUrls.get(i), i);
+            }
+        }
     }
 
     // 권한별 공개/비공개 범위 조회

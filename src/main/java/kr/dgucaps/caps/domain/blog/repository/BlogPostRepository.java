@@ -31,7 +31,7 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, Integer> {
             Pageable pageable
     );
 
-    @EntityGraph(attributePaths = {"member", "files", "images"})
+    @EntityGraph(attributePaths = {"member"})
     @Query("SELECT b FROM BlogPost b WHERE b.id = :id")
     Optional<BlogPost> findWithDetailsById(@Param("id") Integer id);
 }

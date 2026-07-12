@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +24,7 @@ public class BlogController implements BlogApi {
 
     private final BlogService blogService;
 
-    // 카테고리별 게시물 목록을 조회한다.
+    // 카테고리별 게시물 목록 조회
     @GetMapping
     public ResponseEntity<SuccessResponse<?>> getBlogs(
             @RequestParam("category") @NotNull BlogCategory category,
@@ -31,5 +32,14 @@ public class BlogController implements BlogApi {
             @Auth Long memberId
     ) {
         return SuccessResponse.ok(blogService.getBlogsByPage(category, page - 1, memberId));
+    }
+
+    // 게시물 상세 조회
+    @GetMapping("/{blogId}")
+    public ResponseEntity<SuccessResponse<?>> getBlog(
+            @PathVariable("blogId") Integer blogId,
+            @Auth Long memberId
+    ) {
+        return SuccessResponse.ok(blogService.getBlogById(blogId, memberId));
     }
 }

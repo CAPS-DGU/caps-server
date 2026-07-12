@@ -45,7 +45,11 @@ public enum ErrorCode {
     WIKI_ALREADY_EXISTS(HttpStatus.CONFLICT, "W002", "이미 존재하는 위키입니다."),
 
     // Ledger
-    LEDGER_NOT_FOUND(HttpStatus.NOT_FOUND, "L001", "장부가 존재하지 않습니다.")
+    LEDGER_NOT_FOUND(HttpStatus.NOT_FOUND, "L001", "장부가 존재하지 않습니다."),
+
+    // Blog
+    BLOG_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "블로그 게시물이 존재하지 않습니다."),
+    BLOG_PRIVATE(HttpStatus.FORBIDDEN, "B002", "비공개 처리된 게시물입니다.")
     ;
 
     private final HttpStatus httpStatus;

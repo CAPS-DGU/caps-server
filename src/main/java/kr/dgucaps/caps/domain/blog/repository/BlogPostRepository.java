@@ -19,6 +19,18 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, Integer> {
     @EntityGraph(attributePaths = {"member"})
     Page<BlogPost> findByCategory(BlogCategory category, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"member"})
+    @Query("""
+            SELECT b FROM BlogPost b
+            WHERE b.category = :category
+              AND (b.isPrivate = false OR b.member.id = :memberId)
+            """)
+    Page<BlogPost> findVisibleByCategory(
+            @Param("category") BlogCategory category,
+            @Param("memberId") Long memberId,
+            Pageable pageable
+    );
+
     @EntityGraph(attributePaths = {"member", "files", "images"})
     @Query("SELECT b FROM BlogPost b WHERE b.id = :id")
     Optional<BlogPost> findWithDetailsById(@Param("id") Integer id);

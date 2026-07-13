@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import kr.dgucaps.caps.domain.blog.dto.request.CreateOrModifyBlogRequest;
 import kr.dgucaps.caps.domain.blog.dto.response.BlogListResponse;
 import kr.dgucaps.caps.domain.blog.dto.response.BlogResponse;
@@ -25,7 +24,7 @@ public interface BlogApi {
 
     @Operation(
             summary = "게시물 목록 조회",
-            description = "카테고리별 게시물 목록을 조회합니다. 비공개 게시물은 작성자/PRESIDENT/ADMIN에게만 노출됩니다."
+            description = "게시물 목록을 조회합니다."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "게시물 목록 조회 성공",
@@ -33,9 +32,8 @@ public interface BlogApi {
                             schema = @Schema(implementation = BlogListResponse.class)))
     })
     ResponseEntity<SuccessResponse<?>> getBlogs(
-            @RequestParam("category") @NotNull BlogCategory category,
-            @RequestParam(value = "page", required = false, defaultValue = "1") @Valid @Min(1) Integer page,
-            @Auth Long memberId
+            @RequestParam(value = "category", required = false) BlogCategory category,
+            @RequestParam(value = "page", required = false, defaultValue = "1") @Valid @Min(1) Integer page
     );
 
     @Operation(
@@ -50,8 +48,7 @@ public interface BlogApi {
             @ApiResponse(responseCode = "404", description = "존재하지 않는 게시물입니다.")
     })
     ResponseEntity<SuccessResponse<?>> getBlog(
-            @PathVariable("blogId") Integer blogId,
-            @Auth Long memberId
+            @PathVariable("blogId") Integer blogId
     );
 
     @Operation(
@@ -62,7 +59,7 @@ public interface BlogApi {
             @ApiResponse(responseCode = "201", description = "게시물 작성 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = BlogResponse.class))),
-            @ApiResponse(responseCode = "401", description = "게시물을 작성할 권한이 없습니다.")
+            @ApiResponse(responseCode = "403", description = "게시물을 작성할 권한이 없습니다.")
     })
     ResponseEntity<SuccessResponse<?>> createBlog(
             @Auth Long memberId,
@@ -77,7 +74,7 @@ public interface BlogApi {
             @ApiResponse(responseCode = "200", description = "게시물 수정 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = BlogResponse.class))),
-            @ApiResponse(responseCode = "401", description = "게시물을 수정할 권한이 없습니다."),
+            @ApiResponse(responseCode = "403", description = "게시물을 수정할 권한이 없습니다."),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 게시물입니다.")
     })
     ResponseEntity<SuccessResponse<?>> modifyBlog(
@@ -92,7 +89,7 @@ public interface BlogApi {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "게시물 삭제 성공"),
-            @ApiResponse(responseCode = "401", description = "게시물을 삭제할 권한이 없습니다."),
+            @ApiResponse(responseCode = "403", description = "게시물을 삭제할 권한이 없습니다."),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 게시물입니다.")
     })
     ResponseEntity<SuccessResponse<?>> deleteBlog(

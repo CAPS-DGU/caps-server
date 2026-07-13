@@ -43,18 +43,18 @@ public class BlogService {
     private final ApplicationEventPublisher publisher;
 
     // 카테고리·권한별 게시물 목록 조회
-    public Page<BlogListResponse> getBlogsByPage(BlogCategory category, int page, Long memberId) {
+    public Page<BlogListResponse> getBlogsByPage(BlogCategory category, int page) {
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<BlogPost> blogPage = findBlogs(category, memberId, pageable);
+        Page<BlogPost> blogPage = findBlogs(category, pageable);
         return blogPage.map(BlogListResponse::from);
     }
 
     // 게시물 상세 조회 및 조회수 증가
     @Transactional
-    public BlogResponse getBlogById(Integer blogId, Long memberId) {
+    public BlogResponse getBlogById(Integer blogId) {
         BlogPost blogPost = blogPostRepository.findWithDetailsById(blogId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.BLOG_NOT_FOUND));
-        validatePrivateAccess(blogPost, memberId);
+        validatePrivateAccess(blogPost);
         blogPost.increaseViewCount();
         return BlogResponse.from(blogPost);
     }
@@ -169,37 +169,36 @@ public class BlogService {
     }
 
     // 권한별 공개/비공개 범위 조회
-    private Page<BlogPost> findBlogs(BlogCategory category, Long memberId, Pageable pageable) {
-        if (canViewAllPrivatePosts()) {
+    private Page<BlogPost> findBlogs(BlogCategory category, Pageable pageable) {
+        if (hasBlogManageRole()) {
+            if (category == null) {
+                return blogPostRepository.findAll(pageable);
+            }
             return blogPostRepository.findByCategory(category, pageable);
         }
-        if (memberId != null) {
-            return blogPostRepository.findVisibleByCategory(category, memberId, pageable);
+        if (category == null) {
+            return blogPostRepository.findByIsPrivateFalse(pageable);
         }
         return blogPostRepository.findByCategoryAndIsPrivateFalse(category, pageable);
     }
 
     // 비공개 게시물 열람 권한 검사
-    private void validatePrivateAccess(BlogPost blogPost, Long memberId) {
+    private void validatePrivateAccess(BlogPost blogPost) {
         if (!blogPost.isPrivate()) {
             return;
         }
-        if (canViewAllPrivatePosts()) {
-            return;
+        if (!hasBlogManageRole()) {
+            throw new ForbiddenException(ErrorCode.BLOG_PRIVATE);
         }
-        if (memberId != null && blogPost.getMember().getId().equals(memberId)) {
-            return;
-        }
-        throw new ForbiddenException(ErrorCode.BLOG_PRIVATE);
     }
 
-    // 비공개 전체 열람 역할 검사
-    private boolean canViewAllPrivatePosts() {
+    // 블로그 관리 권한 (비공개 조회, 작성/수정/삭제)
+    private boolean hasBlogManageRole() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomOAuth2User customUser)) {
             return false;
         }
         Role role = customUser.authDto().role();
-        return role == Role.PRESIDENT || role == Role.ADMIN;
+        return role == Role.COUNCIL || role == Role.PRESIDENT || role == Role.ADMIN;
     }
 }

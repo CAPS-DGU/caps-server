@@ -68,4 +68,34 @@ public interface BlogApi {
             @Auth Long memberId,
             @RequestBody @Valid CreateOrModifyBlogRequest request
     );
+
+    @Operation(
+            summary = "게시물 수정",
+            description = "기존 블로그 게시물을 수정합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "게시물 수정 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BlogResponse.class))),
+            @ApiResponse(responseCode = "401", description = "게시물을 수정할 권한이 없습니다."),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 게시물입니다.")
+    })
+    ResponseEntity<SuccessResponse<?>> modifyBlog(
+            @Auth Long memberId,
+            @PathVariable("blogId") Integer blogId,
+            @RequestBody @Valid CreateOrModifyBlogRequest request
+    );
+
+    @Operation(
+            summary = "게시물 삭제",
+            description = "블로그 게시물을 삭제합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "게시물 삭제 성공"),
+            @ApiResponse(responseCode = "401", description = "게시물을 삭제할 권한이 없습니다."),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 게시물입니다.")
+    })
+    ResponseEntity<SuccessResponse<?>> deleteBlog(
+            @PathVariable("blogId") Integer blogId
+    );
 }

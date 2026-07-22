@@ -6,6 +6,7 @@ import kr.dgucaps.caps.global.config.auth.jwt.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -66,6 +67,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
                         authorizationManagerRequestMatcherRegistry
                                 .requestMatchers(whiteList).permitAll()
+                                // JWT는 통과시키되 비로그인도 허용 (비공개글 권한 판별용)
+                                .requestMatchers(HttpMethod.GET, "/api/v1/blogs", "/api/v1/blogs/*").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/files/blog/presigned-url").permitAll()
                                 .requestMatchers("/api/v1/auth/complete-registration").hasRole("CONSENT")
                                 .requestMatchers("/api/**").hasRole("ACCESS")
                                 .anyRequest().authenticated()

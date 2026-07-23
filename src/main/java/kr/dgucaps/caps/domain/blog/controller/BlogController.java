@@ -74,6 +74,6 @@ public class BlogController implements BlogApi {
             @PathVariable("blogId") Integer blogId
     ) {
         blogService.deleteBlog(blogId);
-        return ResponseEntity.noContent().build();
+        return SuccessResponse.noContent();
     }
 }

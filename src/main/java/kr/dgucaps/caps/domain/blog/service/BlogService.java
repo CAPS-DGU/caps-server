@@ -2,6 +2,7 @@ package kr.dgucaps.caps.domain.blog.service;
 
 import kr.dgucaps.caps.domain.auth.dto.CustomOAuth2User;
 import kr.dgucaps.caps.domain.blog.dto.request.CreateOrModifyBlogRequest;
+import kr.dgucaps.caps.domain.blog.dto.response.BlogDetailResponse;
 import kr.dgucaps.caps.domain.blog.dto.response.BlogListResponse;
 import kr.dgucaps.caps.domain.blog.dto.response.BlogResponse;
 import kr.dgucaps.caps.domain.blog.entity.BlogCategory;
@@ -51,12 +52,12 @@ public class BlogService {
 
     // 게시물 상세 조회 및 조회수 증가
     @Transactional
-    public BlogResponse getBlogById(Integer blogId) {
+    public BlogDetailResponse getBlogById(Integer blogId) {
         BlogPost blogPost = blogPostRepository.findWithDetailsById(blogId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.BLOG_NOT_FOUND));
         validatePrivateAccess(blogPost);
         blogPost.increaseViewCount();
-        return BlogResponse.from(blogPost);
+        return BlogDetailResponse.from(blogPost);
     }
 
     // 게시물 작성

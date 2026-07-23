@@ -27,8 +27,7 @@ public class SuccessResponse<T> {
     }
 
     public static ResponseEntity<SuccessResponse<?>> noContent() {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body(SuccessResponse.of(SuccessCode.NO_CONTENT, null));
+        return ResponseEntity.noContent().build();
     }
 
     public static <T> SuccessResponse<?> of(SuccessCode successCode, T data) {

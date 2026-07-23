@@ -59,7 +59,7 @@ public class LedgerController implements LedgerApi {
             @PathVariable("ledgerId") Long ledgerId
     ) {
         ledgerService.deleteLedger(ledgerId, memberId);
-        return ResponseEntity.noContent().build();
+        return SuccessResponse.noContent();
     }
 
 }

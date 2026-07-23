@@ -27,7 +27,7 @@ public interface AuthApi {
             content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = MemberInfoResponse.class))
     )
-    ResponseEntity<SuccessResponse<?>> completeRegistration(@Auth Long memberId,
+    ResponseEntity<Void> completeRegistration(@Auth Long memberId,
                                                             @RequestBody @Valid CompleteRegistrationRequest request,
                                                             HttpServletResponse response);
 
@@ -38,7 +38,7 @@ public interface AuthApi {
                     "클라이언트의 액세스, 리프레쉬 토큰을 삭제해야합니다."
     )
     @ApiResponse(responseCode = "204", description = "로그아웃 성공")
-    ResponseEntity<SuccessResponse<?>> logout(@Auth Long memberId, HttpServletResponse response);
+    ResponseEntity<Void> logout(@Auth Long memberId, HttpServletResponse response);
 
     @Operation(
             summary = "토큰 재발급",
@@ -51,6 +51,6 @@ public interface AuthApi {
             @ApiResponse(responseCode = "401", description = "리프레쉬 토큰이 유효하지 않음"),
             @ApiResponse(responseCode = "500", description = "리프레쉬 토큰이 파싱 실패"),
     })
-    ResponseEntity<SuccessResponse<?>> reissueToken(@CookieValue(value = "refreshToken", required = false) String refreshToken,
+    ResponseEntity<Void> reissueToken(@CookieValue(value = "refreshToken", required = false) String refreshToken,
                                                     HttpServletResponse response);
 }

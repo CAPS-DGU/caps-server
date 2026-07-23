@@ -70,7 +70,7 @@ public class BlogController implements BlogApi {
     // 게시물 삭제
     @PreAuthorize("hasAnyRole('COUNCIL', 'PRESIDENT', 'ADMIN')")
     @DeleteMapping("/{blogId}")
-    public ResponseEntity<SuccessResponse<?>> deleteBlog(
+    public ResponseEntity<Void> deleteBlog(
             @PathVariable("blogId") Integer blogId
     ) {
         blogService.deleteBlog(blogId);

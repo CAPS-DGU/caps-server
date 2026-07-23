@@ -19,7 +19,7 @@ public class AuthController implements AuthApi {
 
     // 회원가입 후 추가 정보 입력
     @PatchMapping("/complete-registration")
-    public ResponseEntity<SuccessResponse<?>> completeRegistration(@Auth Long memberId,
+    public ResponseEntity<Void> completeRegistration(@Auth Long memberId,
                                                                    @RequestBody @Valid CompleteRegistrationRequest request,
                                                                    HttpServletResponse response) {
         authService.completeRegistration(memberId, request, response);
@@ -28,14 +28,14 @@ public class AuthController implements AuthApi {
 
     // 로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<SuccessResponse<?>> logout(@Auth Long memberId, HttpServletResponse response) {
+    public ResponseEntity<Void> logout(@Auth Long memberId, HttpServletResponse response) {
         authService.logout(memberId, response);
         return SuccessResponse.noContent();
     }
 
     // 리프레쉬 토큰 재발급
     @PostMapping("/reissue")
-    public ResponseEntity<SuccessResponse<?>> reissueToken(@CookieValue(value = "refreshToken", required = false) String refreshToken,
+    public ResponseEntity<Void> reissueToken(@CookieValue(value = "refreshToken", required = false) String refreshToken,
                                                            HttpServletResponse response) {
         authService.reissueToken(refreshToken, response);
         return SuccessResponse.noContent();

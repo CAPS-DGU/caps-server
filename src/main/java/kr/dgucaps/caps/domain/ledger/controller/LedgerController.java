@@ -54,7 +54,7 @@ public class LedgerController implements LedgerApi {
 
     @PreAuthorize("hasAnyRole('COUNCIL', 'PRESIDENT', 'ADMIN')")
     @DeleteMapping("/{ledgerId}")
-    public ResponseEntity<SuccessResponse<?>> deleteLedger(
+    public ResponseEntity<Void> deleteLedger(
             @Auth Long memberId,
             @PathVariable("ledgerId") Long ledgerId
     ) {

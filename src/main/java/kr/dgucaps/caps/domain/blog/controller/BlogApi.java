@@ -93,7 +93,7 @@ public interface BlogApi {
             @ApiResponse(responseCode = "403", description = "게시물을 삭제할 권한이 없습니다."),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 게시물입니다.")
     })
-    ResponseEntity<SuccessResponse<?>> deleteBlog(
+    ResponseEntity<Void> deleteBlog(
             @PathVariable("blogId") Integer blogId
     );
 }

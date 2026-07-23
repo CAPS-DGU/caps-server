@@ -82,7 +82,7 @@ public interface LedgerApi {
             @ApiResponse(responseCode = "401", description = "게시물을 삭제할 권한이 없음"),
             @ApiResponse(responseCode = "404", description = "해당 게시물이 존재하지 않음")
     })
-    ResponseEntity<SuccessResponse<?>> deleteLedger(
+    ResponseEntity<Void> deleteLedger(
             @Auth Long memberId,
             @PathVariable("ledgerId") Long ledgerId
     );

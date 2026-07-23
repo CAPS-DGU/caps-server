@@ -26,7 +26,7 @@ public class SuccessResponse<T> {
                 .body(SuccessResponse.of(SuccessCode.CREATED, data));
     }
 
-    public static ResponseEntity<SuccessResponse<?>> noContent() {
+    public static ResponseEntity<Void> noContent() {
         return ResponseEntity.noContent().build();
     }
 

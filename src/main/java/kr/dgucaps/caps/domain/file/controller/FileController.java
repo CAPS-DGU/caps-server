@@ -60,7 +60,7 @@ public class FileController {
     // 파일 삭제
     @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @DeleteMapping
-    public ResponseEntity<SuccessResponse<?>> deleteFile(
+    public ResponseEntity<Void> deleteFile(
             @RequestParam("key") @NotBlank String fileKey) {
         fileService.deleteFile(fileKey);
         return SuccessResponse.noContent();

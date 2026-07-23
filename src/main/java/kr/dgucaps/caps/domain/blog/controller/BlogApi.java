@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import kr.dgucaps.caps.domain.blog.dto.request.CreateOrModifyBlogRequest;
+import kr.dgucaps.caps.domain.blog.dto.response.BlogDetailResponse;
 import kr.dgucaps.caps.domain.blog.dto.response.BlogListResponse;
 import kr.dgucaps.caps.domain.blog.dto.response.BlogResponse;
 import kr.dgucaps.caps.domain.blog.entity.BlogCategory;
@@ -43,7 +44,7 @@ public interface BlogApi {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "게시물 상세 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = BlogResponse.class))),
+                            schema = @Schema(implementation = BlogDetailResponse.class))),
             @ApiResponse(responseCode = "403", description = "비공개 처리된 게시물입니다."),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 게시물입니다.")
     })

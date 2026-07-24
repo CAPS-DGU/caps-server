@@ -15,6 +15,7 @@ public record BlogDetailResponse(
         String title,
         String subtitle,
         String content,
+        String thumbnailUrl,
         BlogCategory category,
         boolean isPrivate,
         Float writerGrade,
@@ -29,6 +30,7 @@ public record BlogDetailResponse(
                 .title(blogPost.getTitle())
                 .subtitle(blogPost.getSubtitle())
                 .content(blogPost.getContent())
+                .thumbnailUrl(blogPost.getThumbnailUrl())
                 .category(blogPost.getCategory())
                 .isPrivate(blogPost.isPrivate())
                 .writerGrade(blogPost.getWriterGrade())

@@ -25,4 +25,6 @@ public interface BlogPostRepository extends JpaRepository<BlogPost, Integer> {
     @EntityGraph(attributePaths = {"member"})
     @Query("SELECT b FROM BlogPost b WHERE b.id = :id")
     Optional<BlogPost> findWithDetailsById(@Param("id") Integer id);
+
+    boolean existsByThumbnailUrl(String thumbnailUrl);
 }

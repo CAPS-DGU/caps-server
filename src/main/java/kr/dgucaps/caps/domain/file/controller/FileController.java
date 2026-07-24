@@ -3,6 +3,8 @@ package kr.dgucaps.caps.domain.file.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import kr.dgucaps.caps.domain.blog.repository.BlogFileRepository;
+import kr.dgucaps.caps.domain.blog.repository.BlogImageRepository;
+import kr.dgucaps.caps.domain.blog.repository.BlogPostRepository;
 import kr.dgucaps.caps.domain.file.dto.request.PresignedUrlRequest;
 import kr.dgucaps.caps.domain.file.service.FileService;
 import kr.dgucaps.caps.global.common.SuccessResponse;
@@ -24,6 +26,8 @@ public class FileController {
 
     private final FileService fileService;
     private final BlogFileRepository blogFileRepository;
+    private final BlogImageRepository blogImageRepository;
+    private final BlogPostRepository blogPostRepository;
 
     // Presigned URL 발급 (파일 업로드용)
     @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
@@ -46,11 +50,11 @@ public class FileController {
         return SuccessResponse.ok(Map.of("downloadURL", presignedUrl));
     }
 
-    // 블로그 첨부파일 다운로드 — (비로그인 포함) 공개
+    // 블로그 첨부파일·본문 이미지·썸네일 조회/다운로드 — (비로그인 포함) 공개
     @GetMapping("/blog/presigned-url")
     public ResponseEntity<SuccessResponse<?>> getBlogPresignedDownloadUrl(
             @RequestParam("key") @NotBlank String fileKey) {
-        if (!blogFileRepository.existsByFileUrl(fileKey)) {
+        if (!isBlogAsset(fileKey)) {
             throw new ForbiddenException(ErrorCode.FORBIDDEN);
         }
         String presignedUrl = fileService.generatePresignedDownloadUrl(fileKey);
@@ -64,5 +68,12 @@ public class FileController {
             @RequestParam("key") @NotBlank String fileKey) {
         fileService.deleteFile(fileKey);
         return SuccessResponse.noContent();
+    }
+
+    // 블로그에 등록된 첨부파일·본문 이미지·썸네일인지 확인
+    private boolean isBlogAsset(String fileKey) {
+        return blogFileRepository.existsByFileUrl(fileKey)
+                || blogImageRepository.existsByFileUrl(fileKey)
+                || blogPostRepository.existsByThumbnailUrl(fileKey);
     }
 }

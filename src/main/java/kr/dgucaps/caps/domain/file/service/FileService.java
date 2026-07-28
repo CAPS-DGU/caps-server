@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -44,7 +45,7 @@ public class FileService {
                     .contentType(fileType != null ? fileType : "application/octet-stream")
                     .build();
 
-            try (S3Presigner presigner = S3Presigner.create()) {
+            try (S3Presigner presigner = S3Presigner.builder().region(Region.of(region)).build()) {
                 PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
                         .signatureDuration(Duration.ofMinutes(5)) // 5분 유효
                         .putObjectRequest(putObjectRequest)
@@ -77,7 +78,7 @@ public class FileService {
                     .key(fileKey)
                     .build();
 
-            try (S3Presigner presigner = S3Presigner.create()) {
+            try (S3Presigner presigner = S3Presigner.builder().region(Region.of(region)).build()) {
                 GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                         .signatureDuration(Duration.ofMinutes(15)) // 15분 유효
                         .getObjectRequest(getObjectRequest)

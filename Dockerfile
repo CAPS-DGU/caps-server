@@ -12,4 +12,4 @@ ARG JAR_FILE=build/libs/caps-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} app.jar
 
 # JVM 시간대 설정을 포함한 애플리케이션 실행
-ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-Dfile.encoding=UTF-8", "-Dsun.jnu.encoding=UTF-8", "-Duser.timezone=Asia/Seoul", "-jar", "/app.jar"]

@@ -8,25 +8,28 @@
 
 - 개발 기간 : 2025.04 - 현재
 
-- 홈페이지 관리부 (39.5기, 25년 2학기 기준)
+- 홈페이지 관리부 (39.5기, 26년 2학기 기준)
   - 38기 김다인(부장): PM, BE
   - 37기 장준혁: FE
   - 37기 원종인: FE, BE
-  - 39.5기 윤유겸: BE
-  - 39.5기 이수빈: DE
 
 ## 🖥️ 서비스 화면
 
-<img width="1495" height="856" alt="스크린샷 2026-01-18 오후 3 41 41" src="https://github.com/user-attachments/assets/269075a4-1214-40a2-b69e-d7b5f7fa9741" />
+<img width="1893" height="992" alt="main page" src="https://github.com/user-attachments/assets/1d831c7f-36d5-489d-a7ba-a9bc340f1415" />
 
 ## 🛠️ 기술 스택
 
 - Frontend
-  - React
+  - React(TypeScript, JavaScript)
   - Vite
+  - Tailwind CSS
+  - React Query (@tanstack/react-query)
+  - React Router DOM
 - Backend
   - Spring Boot
   - Spring Security
+- DB
+  - MySQL
   - S3
 - DevOps
   - AWS EC2
@@ -36,6 +39,7 @@
   - GitHub
   - Figma
   - Notion
+  - Discord
  
 ## 💡 주요 기능
 

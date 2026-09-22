@@ -6,6 +6,7 @@ import kr.dgucaps.caps.domain.ledger.dto.response.LedgerResponse;
 import kr.dgucaps.caps.domain.ledger.entity.Ledger;
 import kr.dgucaps.caps.domain.ledger.repository.LedgerRepository;
 import kr.dgucaps.caps.domain.member.entity.Member;
+import kr.dgucaps.caps.domain.member.entity.Role;
 import kr.dgucaps.caps.domain.member.repository.MemberRepository;
 import kr.dgucaps.caps.global.error.ErrorCode;
 import kr.dgucaps.caps.global.error.exception.EntityNotFoundException;
@@ -54,9 +55,7 @@ public class LedgerService {
         Ledger ledger = ledgerRepository.findById(ledgerId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.LEDGER_NOT_FOUND));
 
-        if (!ledger.getMember().getId().equals(memberId)) {
-            throw new ForbiddenException(ErrorCode.FORBIDDEN);
-        }
+        validateManageRole(memberId);
 
         ledger.updateLedger(request.title(), request.content(), request.fileUrls(), request.isPinned());
         Ledger updatedLedger = ledgerRepository.save(ledger);
@@ -68,11 +67,18 @@ public class LedgerService {
         Ledger ledger = ledgerRepository.findById(ledgerId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.LEDGER_NOT_FOUND));
 
-        if (!ledger.getMember().getId().equals(memberId)) {
-            throw new ForbiddenException(ErrorCode.FORBIDDEN);
-        }
+        validateManageRole(memberId);
 
         ledgerRepository.deleteById(ledgerId);
+    }
+
+    private void validateManageRole(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        Role role = member.getRole();
+        if (role != Role.COUNCIL && role != Role.PRESIDENT && role != Role.ADMIN) {
+            throw new ForbiddenException(ErrorCode.FORBIDDEN);
+        }
     }
 
 }

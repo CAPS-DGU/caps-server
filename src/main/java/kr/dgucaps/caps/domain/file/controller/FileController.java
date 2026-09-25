@@ -43,7 +43,7 @@ public class FileController {
     }
 
     // 파일 삭제 (임의 삭제 방지를 위해 관리자만 허용)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN', 'PRESIDENT', 'COUNCIL')")
     @DeleteMapping
     public ResponseEntity<SuccessResponse<?>> deleteFile(
             @RequestParam("key") @NotBlank String fileKey) {

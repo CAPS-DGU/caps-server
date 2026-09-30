@@ -70,17 +70,17 @@ public class FileService {
     /**
      * Presigned URL 발급 (다운로드용)
      * @param fileKey 파일 키 (경로)
-     * @param hasAttachmant
+     * @param hasAttachment
      * @return Presigned URL
      */
-    public String generatePresignedDownloadUrl(String fileKey, boolean hasAttachmant) {
+    public String generatePresignedDownloadUrl(String fileKey, boolean hasAttachment) {
 
         try {
             GetObjectRequest.Builder requestBuilder = GetObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(key);
+                    .key(fileKey);
 
-            if (hasAttachmant){
+            if (hasAttachment){
                 String fileName = extractOriginalFileName(fileKey);
                 String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
                         ..replace("+", "%20")

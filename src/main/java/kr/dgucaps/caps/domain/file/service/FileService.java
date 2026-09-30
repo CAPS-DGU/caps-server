@@ -83,7 +83,7 @@ public class FileService {
             if (hasAttachment){
                 String fileName = extractOriginalFileName(fileKey);
                 String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
-                        ..replace("+", "%20")
+                        .replace("+", "%20")
                         .replace("*", "%2A")
                         .replace("%7E", "~");
 

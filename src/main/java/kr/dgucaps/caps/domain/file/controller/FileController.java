@@ -22,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/files")
 @Validated
-public class FileController {
+public class FileController implements FileApi {
 
     private final FileService fileService;
     private final BlogFileRepository blogFileRepository;
@@ -30,6 +30,7 @@ public class FileController {
     private final BlogPostRepository blogPostRepository;
 
     // Presigned URL 발급 (파일 업로드용)
+    @Override
     @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @PostMapping("/presigned-url")
     public ResponseEntity<SuccessResponse<?>> getPresignedUrl(
@@ -42,26 +43,31 @@ public class FileController {
     }
 
     // Presigned URL 발급 (다운로드용) — ledger, Report: MEMBER 이상
+    @Override
     @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @GetMapping("/presigned-url")
     public ResponseEntity<SuccessResponse<?>> getPresignedDownloadUrl(
-            @RequestParam("key") @NotBlank String fileKey) {
-        String presignedUrl = fileService.generatePresignedDownloadUrl(fileKey);
+            @RequestParam("key") @NotBlank String fileKey,
+            @RequestParam(name = "download", defaultValue = "false") boolean download) {
+        String presignedUrl = fileService.generatePresignedDownloadUrl(fileKey, download);
         return SuccessResponse.ok(Map.of("downloadURL", presignedUrl));
     }
 
     // 블로그 첨부파일·본문 이미지·썸네일 조회/다운로드 — (비로그인 포함) 공개
+    @Override
     @GetMapping("/blog/presigned-url")
     public ResponseEntity<SuccessResponse<?>> getBlogPresignedDownloadUrl(
-            @RequestParam("key") @NotBlank String fileKey) {
+            @RequestParam("key") @NotBlank String fileKey,
+            @RequestParam(name = "download", defaultValue = "false") boolean download) {
         if (!isBlogAsset(fileKey)) {
             throw new ForbiddenException(ErrorCode.FORBIDDEN);
         }
-        String presignedUrl = fileService.generatePresignedDownloadUrl(fileKey);
+        String presignedUrl = fileService.generatePresignedDownloadUrl(fileKey, download);
         return SuccessResponse.ok(Map.of("downloadURL", presignedUrl));
     }
 
     // 파일 삭제
+    @Override
     @PreAuthorize("hasAnyRole('MEMBER', 'GRADUATE', 'COUNCIL', 'PRESIDENT', 'ADMIN')")
     @DeleteMapping
     public ResponseEntity<Void> deleteFile(

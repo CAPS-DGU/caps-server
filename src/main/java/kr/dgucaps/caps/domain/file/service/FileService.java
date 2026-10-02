@@ -10,11 +10,13 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
-import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
 
@@ -69,14 +71,28 @@ public class FileService {
     /**
      * Presigned URL 발급 (다운로드용)
      * @param fileKey 파일 키 (경로)
+     * @param hasAttachment
      * @return Presigned URL
      */
-    public String generatePresignedDownloadUrl(String fileKey) {
+    public String generatePresignedDownloadUrl(String fileKey, boolean hasAttachment) {
+
         try {
-            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            GetObjectRequest.Builder requestBuilder = GetObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(fileKey)
-                    .build();
+                    .key(fileKey);
+
+            if (hasAttachment){
+                String fileName = extractOriginalFileName(fileKey);
+
+                String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+                        .replace("+", "%20")
+                        .replace("*", "%2A")
+                        .replace("%7E", "~");
+
+                requestBuilder.responseContentDisposition("attachment; filename*=UTF-8''"+encodedFileName);
+            }
+
+            GetObjectRequest getObjectRequest = requestBuilder.build();
 
             try (S3Presigner presigner = S3Presigner.builder().region(Region.of(region)).build()) {
                 GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -114,5 +130,16 @@ public class FileService {
             throw new RuntimeException("파일 삭제에 실패했습니다.", e);
         }
     }
+
+    /**
+     * fileKey에서 fileName 추출
+     * @param fileKey
+     * @return fileName
+     */
+    private String extractOriginalFileName(String fileKey) {
+        String fileName = fileKey.substring(fileKey.lastIndexOf("/") + 1);
+        return fileName.replaceFirst("^\\d+_\\d+_", "");
+    }
+
 }
 
